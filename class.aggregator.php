@@ -8,17 +8,19 @@ define('FILES_LIMIT',   4000000);
 define('FILES_ALLOWED', serialize(['jpg', 'png', 'gif', 'svg', 'jpeg']));
 define('POST_LIMIT', 500);
 define('DELETE_TOKEN', 'scroll-del-7f3a9c');
+define('USERS', ['scott', 'mike']);
 
 class aggregator
 {
     public $postCount;
     private $db, $dbc;
-    private $page;
+    private $page, $user;
 
-    function __construct($pageNumber = 1)
+    function __construct($pageNumber = 1, $user = null)
     {
-        $this->db  = new db('share.db');
-        $this->dbc = $this->db->db;
+        $this->db   = new db('share.db');
+        $this->dbc  = $this->db->db;
+        $this->user = (is_string($user) && in_array($user, USERS)) ? $user : null;
         $this->migrate();
         if (empty($pageNumber) || $pageNumber < 1) $pageNumber = 1;
         $this->page = (int) $pageNumber;
@@ -63,6 +65,12 @@ class aggregator
             $this->dbc->exec("ALTER TABLE posts ADD COLUMN image BLOB");
             $this->dbc->exec("ALTER TABLE posts ADD COLUMN mime TEXT");
         }
+        if (!in_array('user', $cols)) {
+            $this->dbc->exec("ALTER TABLE posts ADD COLUMN user TEXT");
+        }
+        if (!in_array('bumped', $cols)) {
+            $this->dbc->exec("ALTER TABLE posts ADD COLUMN bumped REAL");
+        }
     }
 
     public function deletePost($id)
@@ -78,6 +86,7 @@ class aggregator
         $comment = parseMarkdown($postData['comment'] ?? '');
         $stmt = $this->dbc->prepare("INSERT INTO comments (post, name, comment) VALUES (?, ?, ?)");
         $stmt->execute([$postid, $name, $comment]);
+        $this->dbc->prepare("UPDATE posts SET bumped=datetime('now','localtime') WHERE id=?")->execute([$postid]);
         return ['name' => $name, 'comment' => $comment];
     }
 
@@ -110,32 +119,43 @@ class aggregator
         }
 
         if ($gameOn) {
+            $user    = isset($postData['user']) && in_array($postData['user'], USERS) ? $postData['user'] : null;
             $mimeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png',
                         'gif' => 'image/gif', 'svg' => 'image/svg+xml', 'webp' => 'image/webp'];
             if ($haveUpload) {
                 $mime = $mimeMap[$fileExt] ?? 'application/octet-stream';
                 $data = file_get_contents($fileTmp);
-                $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$title, $mime, $data, '']);
+                $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url, user) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$title, $mime, $data, '', $user]);
             } else {
                 if (preg_match('/https?:\/\/(?:i\.)?imgur\.com\/([a-zA-Z0-9]+)\.gifv/i', $url, $m)) {
                     $data = fetchUrl('https://i.imgur.com/' . $m[1] . '.mp4');
                     if ($data) {
-                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
-                        $stmt->execute([$title, 'video/mp4', $data, '']);
+                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url, user) VALUES (?, ?, ?, ?, ?)");
+                        $stmt->execute([$title, 'video/mp4', $data, '', $user]);
                     } else {
-                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, url) VALUES (?, ?)");
-                        $stmt->execute([$title, $url]);
+                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, url, user) VALUES (?, ?, ?)");
+                        $stmt->execute([$title, $url, $user]);
                     }
                 } else {
                     $ext  = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
                     $mime = $mimeMap[$ext] ?? null;
-                    if ($mime && ($data = fetchUrl($url))) {
-                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
-                        $stmt->execute([$title, $mime, $data, '']);
+                    if ($mime) {
+                        $data = fetchUrl($url);
                     } else {
-                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, url) VALUES (?, ?)");
-                        $stmt->execute([$title, $url]);
+                        [$data, $mime] = fetchUrlWithMime($url);
+                        $allowedMimes = array_values($mimeMap);
+                        if (!in_array($mime, $allowedMimes, true)) {
+                            $data = null;
+                            $mime = null;
+                        }
+                    }
+                    if ($mime && $data) {
+                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url, user) VALUES (?, ?, ?, ?, ?)");
+                        $stmt->execute([$title, $mime, $data, '', $user]);
+                    } else {
+                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, url, user) VALUES (?, ?, ?)");
+                        $stmt->execute([$title, $url, $user]);
                     }
                 }
             }
@@ -146,7 +166,7 @@ class aggregator
 
     public function renderPost($id)
     {
-        $stmt = $this->dbc->prepare('SELECT id, title, file, url, date, mime, (image IS NOT NULL) as has_image FROM posts WHERE id=?');
+        $stmt = $this->dbc->prepare('SELECT id, title, file, url, date, mime, user, (image IS NOT NULL) as has_image FROM posts WHERE id=?');
         $stmt->execute([(int) $id]);
         $row = $stmt->fetch();
         return $row ? $this->renderPostMarkup($row) : '';
@@ -154,8 +174,13 @@ class aggregator
 
     private function getTotalPosts()
     {
-        $stmt = $this->dbc->prepare("SELECT COUNT(*) FROM posts");
-        $stmt->execute();
+        if ($this->user) {
+            $stmt = $this->dbc->prepare("SELECT COUNT(*) FROM posts WHERE user=?");
+            $stmt->execute([$this->user]);
+        } else {
+            $stmt = $this->dbc->prepare("SELECT COUNT(*) FROM posts");
+            $stmt->execute();
+        }
         return (int) $stmt->fetchColumn();
     }
 
@@ -168,20 +193,13 @@ class aggregator
 
     public function getAllPosts()
     {
-        $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url, posts.mime, (posts.image IS NOT NULL) as has_image
-                FROM posts
-                LEFT JOIN comments ON comments.post = posts.id
-                WHERE comments.id = (
-                    SELECT comments.id FROM comments
-                    WHERE comments.post = posts.id
-                    ORDER BY comments.date DESC, comments.id DESC
-                ) OR comments.id IS NULL
-                ORDER BY CASE
-                    WHEN comments.date > posts.date THEN comments.date
-                    ELSE posts.date
-                END DESC';
-        $stmt = $this->dbc->prepare($sql);
-        $stmt->execute();
+        $where = $this->user ? 'WHERE user=?' : '';
+        $sql   = "SELECT id, title, file, url, mime, user, (image IS NOT NULL) as has_image,
+                         COALESCE(bumped, date) as date
+                  FROM posts $where
+                  ORDER BY COALESCE(bumped, date) DESC";
+        $stmt  = $this->dbc->prepare($sql);
+        $stmt->execute($this->user ? [$this->user] : []);
         return $stmt->fetchAll();
     }
 
@@ -191,23 +209,15 @@ class aggregator
         if (!$single) {
             $offset    = POST_LIMIT * ($this->page - 1);
             $sqlOffset = 'LIMIT ' . POST_LIMIT . ($this->page > 1 ? ' OFFSET ' . $offset : '');
-
-            $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url, posts.mime, (posts.image IS NOT NULL) as has_image
-                    FROM posts
-                    LEFT JOIN comments ON comments.post = posts.id
-                    WHERE comments.id = (
-                        SELECT comments.id FROM comments
-                        WHERE comments.post = posts.id
-                        ORDER BY comments.date DESC, comments.id DESC
-                    ) OR comments.id IS NULL
-                    ORDER BY CASE
-                        WHEN comments.date > posts.date THEN comments.date
-                        ELSE posts.date
-                    END DESC ' . $sqlOffset;
+            $where     = $this->user ? 'WHERE user=?' : '';
+            $sql       = "SELECT id, title, file, url, mime, user, (image IS NOT NULL) as has_image,
+                                 COALESCE(bumped, date) as date
+                          FROM posts $where
+                          ORDER BY COALESCE(bumped, date) DESC $sqlOffset";
             $stmt = $this->dbc->prepare($sql);
-            $stmt->execute();
+            $stmt->execute($this->user ? [$this->user] : []);
         } else {
-            $stmt = $this->dbc->prepare('SELECT id, title, file, url, date, mime, (image IS NOT NULL) as has_image FROM posts WHERE id=?');
+            $stmt = $this->dbc->prepare('SELECT id, title, file, url, date, mime, user, (image IS NOT NULL) as has_image FROM posts WHERE id=?');
             $stmt->execute([(int) $postid]);
         }
 
@@ -221,17 +231,18 @@ class aggregator
         $pageCount = ceil($this->postCount / POST_LIMIT);
         if ($pageCount <= 1) return;
 
+        $base = $this->user ? APP_PATH . $this->user : APP_PATH;
         if ($this->page > 1) {
             $prev = $this->page - 1;
-            echo '<a class="page-prev" href="' . APP_PATH . '?page=' . $prev . '">&laquo; Prev</a>';
+            echo '<a class="page-prev" href="' . $base . '?page=' . $prev . '">&laquo; Prev</a>';
         }
         foreach (range(1, $pageCount) as $num) {
             $active = $num == $this->page ? ' class="active"' : '';
-            echo '<a href="' . APP_PATH . '?page=' . $num . '"' . $active . '>' . $num . '</a>';
+            echo '<a href="' . $base . '?page=' . $num . '"' . $active . '>' . $num . '</a>';
         }
         if ($this->page < $pageCount) {
             $next = $this->page + 1;
-            echo '<a class="page-next" href="' . APP_PATH . '?page=' . $next . '">Next &raquo;</a>';
+            echo '<a class="page-next" href="' . $base . '?page=' . $next . '">Next &raquo;</a>';
         }
     }
 
@@ -256,7 +267,7 @@ class aggregator
             $src  = APP_PATH . 'img.php?id=' . $rowid;
             $mime = $row['mime'] ?? '';
             if (strpos($mime, 'video/') === 0) {
-                $embedDirect = '<video controls loop playsinline><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></video>';
+                $embedDirect = '<video autoplay controls loop muted playsinline><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></video>';
             } else {
                 $postImg = '<a href="' . $src . '" rel="lightbox">'
                          . '<img src="' . $src . '" alt="' . $postTitle . '" loading="lazy" />'
@@ -266,7 +277,7 @@ class aggregator
             if (preg_match('/https?:\/\/\S+\.(?:png|jpg|jpeg|gif|svg|webp)(\?[^\s]*)?$/i', $url)) {
                 $postImg = '<a class="loader" href="' . $safe . '" rel="lightbox"><img src="' . $safe . '" alt="" loading="lazy" /></a>';
             } elseif (preg_match('/https?:\/\/\S+\.(?:mp4|webm|ogg)(\?[^\s]*)?$/i', $url)) {
-                $embedDirect = '<video controls><source src="' . $safe . '"></video>';
+                $embedDirect = '<video autoplay controls loop muted playsinline><source src="' . $safe . '"></video>';
             } elseif (preg_match('/(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/', $url, $m)) {
                 $id    = $m[1];
                 $embed = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $id . '?autoplay=1" frameborder="0" allowfullscreen></iframe>';
@@ -284,7 +295,7 @@ class aggregator
                 }
             } elseif (preg_match('/https?:\/\/(?:i\.)?imgur\.com\/([a-zA-Z0-9]+)\.gifv/i', $url, $m)) {
                 $mp4 = htmlspecialchars('https://i.imgur.com/' . $m[1] . '.mp4', ENT_QUOTES);
-                $embedDirect = '<video controls loop playsinline><source src="' . $mp4 . '" type="video/mp4"></video>';
+                $embedDirect = '<video autoplay controls loop muted playsinline><source src="' . $mp4 . '" type="video/mp4"></video>';
             } else {
                 $meta = $this->getUrlMeta($url);
                 if (!empty($meta['thumbnail'])) {
@@ -308,6 +319,9 @@ class aggregator
             }
         }
 
+        $postUser = htmlspecialchars($row['user'] ?? '');
+        $userHtml = $postUser ? " &middot; <span class=\"post-user\">$postUser</span>" : '';
+
         return "
             <dl class=\"item\">
                 <dt>
@@ -316,7 +330,7 @@ class aggregator
                     </article>
                 </dt>
                 <dd>
-                    <h3><a href=\"" . APP_PATH . "?post=$rowid\">$titleHtml</a></h3>
+                    <h3><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h3>
                     <details" . ($openComments ? ' open' : '') . ">
                         <summary><var $commentClass>$commentsCount</var> comments</summary>
                         <ul>$comments</ul>
@@ -327,7 +341,7 @@ class aggregator
                             <button type=\"submit\">comment</button>
                         </form>
                     </details>
-                    <footer><time datetime=\"$postDateISO\">$postDate</time></footer>
+                    <footer><time datetime=\"$postDateISO\">$postDate</time>$userHtml</footer>
                 </dd>
             </dl>";
     }
@@ -388,6 +402,26 @@ function fetchUrl($url)
     $err  = curl_errno($curl);
     curl_close($curl);
     return $err ? false : $data;
+}
+
+function fetchUrlWithMime($url)
+{
+    $curl = curl_init($url);
+    if (!$curl) return [null, null];
+    curl_setopt_array($curl, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_USERAGENT      => 'Mozilla/5.0',
+        CURLOPT_SSL_VERIFYPEER => true,
+    ]);
+    $data = curl_exec($curl);
+    $err  = curl_errno($curl);
+    $mime = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
+    curl_close($curl);
+    if ($err || !$data) return [null, null];
+    $mime = strtolower(preg_replace('/;.*$/', '', $mime ?? ''));
+    return [$data, $mime ?: null];
 }
 
 function parseMarkdown($text)

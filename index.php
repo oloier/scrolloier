@@ -1,9 +1,37 @@
-<?php require_once("class.aggregator.php");
+<?php
 
-$postid = $_GET['post'] ?? null;
+// Routing
+$_basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+$_uriPath  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$_path     = substr($_uriPath, strlen($_basePath));
+$_segs     = array_values(array_filter(explode('/', ltrim($_path, '/'))));
+
+$routeUser   = null;
+$routePostId = null;
+
+require_once('class.aggregator.php');
+
+// /feed/username  → RSS
+if (($_segs[0] ?? '') === 'feed' && !empty($_segs[1]) && in_array($_segs[1], USERS)) {
+    $routeUser = $_segs[1];
+    require 'rss.php';
+    exit;
+}
+
+// /post/123  → single post
+if (($_segs[0] ?? '') === 'post' && !empty($_segs[1])) {
+    $routePostId = (int) $_segs[1];
+// /username  → user feed
+} elseif (count($_segs) === 1 && in_array($_segs[0] ?? '', USERS)) {
+    $routeUser = $_segs[0];
+// backward compat query string
+} elseif (isset($_GET['post'])) {
+    $routePostId = (int) $_GET['post'];
+}
+
+$postid = $routePostId;
 $page   = $_GET['page'] ?? null;
-
-$agg = new aggregator($page);
+$agg    = new aggregator($page, $routeUser);
 
 if (isset($_GET['delete']) && ($_GET['token'] ?? '') === DELETE_TOKEN) {
     $agg->deletePost((int) $_GET['delete']);
@@ -33,17 +61,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+
+$feedHref = $routeUser ? APP_PATH . 'feed/' . $routeUser : APP_PATH . 'feed/';
+$pageTitle = 'Scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Scrolloier</title>
+    <title><?= htmlspecialchars($pageTitle) ?></title>
     <meta charset="utf-8" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="<?= ASSETS_PATH ?>style.css" />
     <link rel="icon" type="image/svg+xml" href="<?= ASSETS_PATH ?>img/logo.svg" />
-    <link rel="alternate" type="application/rss+xml" title="Scrolloier" href="<?= APP_PATH ?>rss.php" />
+    <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars($pageTitle) ?>" href="<?= htmlspecialchars($feedHref) ?>" />
 </head>
 <body>
 
@@ -55,6 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <span>or a file</span>
             <input type="file" name="file" />
         </label>
+        <?php if ($routeUser): ?>
+        <input type="hidden" name="user" value="<?= htmlspecialchars($routeUser) ?>" />
+        <?php endif ?>
         <input type="hidden" name="submittedPost" value="1" />
         <button type="submit">post it</button>
     </form>
@@ -63,7 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php
     $singlePost = isset($postid);
-    if ($singlePost) echo '<a href="' . APP_PATH . '" id="back-link">← all posts</a>';
+    $backUrl    = $routeUser ? APP_PATH . $routeUser : APP_PATH;
+    if ($singlePost) echo '<a href="' . htmlspecialchars($backUrl) . '" id="back-link">← back</a>';
     echo '<main role="main" id="posts"' . ($singlePost ? ' class="single"' : '') . '>';
     $agg->getAllOrderedPosts($postid);
     echo '</main>';

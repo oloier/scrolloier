@@ -2,22 +2,27 @@
 header('Content-Type: application/rss+xml; charset=utf-8');
 require_once('class.aggregator.php');
 
+// $routeUser may be set by the index.php router; fall back to query string
+$rssUser = $routeUser ?? (isset($_GET['user']) && in_array($_GET['user'], USERS) ? $_GET['user'] : null);
+
 $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $base  = $proto . '://' . $_SERVER['HTTP_HOST'] . APP_PATH;
 
-$agg  = new aggregator();
-$rows = $agg->getAllPosts();
+$agg   = new aggregator(1, $rssUser);
+$rows  = $agg->getAllPosts();
+
+$feedTitle = 'Scrolloier' . ($rssUser ? ' / ' . $rssUser : '');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?><rss version="2.0">
 <channel>
-    <title>Scrolloier</title>
-    <link><?= htmlspecialchars($base) ?></link>
+    <title><?= htmlspecialchars($feedTitle) ?></title>
+    <link><?= htmlspecialchars($base . ($rssUser ?? '')) ?></link>
     <description>shared stuff</description>
 <?php foreach ($rows as $row):
     $id      = (int) $row['id'];
-    $link    = $base . '?post=' . $id;
-    $pubDate = date(DATE_RSS, strtotime($row['date']));
+    $link    = $base . 'post/' . $id;
+    $pubDate = date(DATE_RSS, strtotime($row['date'])); // already COALESCE(bumped, date)
     $url     = $row['url'] ?? '';
     $desc    = '';
 
