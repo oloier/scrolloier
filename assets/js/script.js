@@ -4,6 +4,16 @@ window.addEventListener('load', function () {
     });
 });
 
+function timeAgo(dtStr) {
+    var d    = new Date(dtStr);
+    var diff = (Date.now() - d) / 1000;
+    if (diff < 60)     return 'just now';
+    if (diff < 3600)   return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400)  return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // new post drawer
@@ -25,6 +35,33 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && newForm.classList.contains('open')) closeDrawer();
+        });
+
+        newForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var urlVal  = newForm.querySelector('[name="url"]');
+            var fileVal = newForm.querySelector('[name="file"]');
+            if (!urlVal.value.trim() && !fileVal.files.length) {
+                urlVal.classList.add('shake');
+                urlVal.addEventListener('animationend', function () { urlVal.classList.remove('shake'); }, { once: true });
+                return;
+            }
+            var data = new FormData(newForm);
+            data.append('_ajax', '1');
+            fetch(newForm.action, { method: 'POST', body: data })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (!res.ok || !res.html) return;
+                    var posts = document.getElementById('posts');
+                    if (posts) {
+                        posts.insertAdjacentHTML('afterbegin', res.html);
+                        var newTime = posts.firstElementChild.querySelector('time[datetime]');
+                        if (newTime) { newTime.textContent = timeAgo(newTime.getAttribute('datetime')); }
+                    }
+                    newForm.reset();
+                    closeDrawer();
+                })
+                .catch(function () {});
         });
     }
 
@@ -87,17 +124,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(function () {});
     });
-
-    // relative timestamps
-    function timeAgo(dtStr) {
-        var d    = new Date(dtStr);
-        var diff = (Date.now() - d) / 1000;
-        if (diff < 60)     return 'just now';
-        if (diff < 3600)   return Math.floor(diff / 60) + 'm ago';
-        if (diff < 86400)  return Math.floor(diff / 3600) + 'h ago';
-        if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
 
     document.querySelectorAll('time[datetime]').forEach(function (el) {
         var dt = el.getAttribute('datetime');

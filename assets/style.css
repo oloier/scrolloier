@@ -333,6 +333,13 @@ dd footer time { font-size: .72em; color: #555; }
     #new-post input[type="url"] { min-width: 100%; }
 }
 
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%       { transform: translateX(-5px); }
+    75%       { transform: translateX(5px); }
+}
+.shake { animation: shake .3s ease; }
+
 /* loading spinner */
 .loader img { visibility: hidden; }
 .loader {

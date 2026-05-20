@@ -17,7 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     if (!empty($_POST['submittedPost'])) {
-        $agg->savePost($_POST, $_FILES);
+        $newId = $agg->savePost($_POST, $_FILES);
+        if (!empty($_POST['_ajax'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => (bool) $newId, 'html' => $newId ? $agg->renderPost($newId) : '']);
+            exit;
+        }
         header('Location: ' . APP_PATH);
         exit;
     }

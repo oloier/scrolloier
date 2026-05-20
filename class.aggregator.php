@@ -132,7 +132,17 @@ class aggregator
                     }
                 }
             }
+            return (int) $this->dbc->lastInsertId();
         }
+        return 0;
+    }
+
+    public function renderPost($id)
+    {
+        $stmt = $this->dbc->prepare('SELECT id, title, file, url, date, mime, (image IS NOT NULL) as has_image FROM posts WHERE id=?');
+        $stmt->execute([(int) $id]);
+        $row = $stmt->fetch();
+        return $row ? $this->renderPostMarkup($row) : '';
     }
 
     private function getTotalPosts()
