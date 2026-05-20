@@ -5,7 +5,6 @@ require_once("class.embedly.php");
 
 define('APP_PATH',    '/share/');
 define('ASSETS_PATH', APP_PATH . 'assets/');
-define('FILES_PATH',  dirname(__DIR__) . APP_PATH . 'assets/uploads/');
 define('FILES_LIMIT',   4000000);
 define('FILES_ALLOWED', serialize(['jpg', 'png', 'gif', 'svg', 'jpeg']));
 define('POST_LIMIT', 500);
