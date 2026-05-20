@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="robots" content="noindex,nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="<?= ASSETS_PATH ?>style.css" />
-    <link rel="shortcut icon" href="<?= APP_PATH ?>favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="<?= ASSETS_PATH ?>img/logo.svg" />
 </head>
 <body>
 
