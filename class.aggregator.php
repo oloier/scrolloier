@@ -20,9 +20,22 @@ class aggregator
     {
         $this->db  = new db('share.db');
         $this->dbc = $this->db->db;
+        $this->migrate();
         if (empty($pageNumber) || $pageNumber < 1) $pageNumber = 1;
         $this->page = (int) $pageNumber;
         $this->postCount = $this->getTotalPosts();
+    }
+
+    private function migrate()
+    {
+        $cols = array_column(
+            $this->dbc->query("PRAGMA table_info(posts)")->fetchAll(),
+            'name'
+        );
+        if (!in_array('image', $cols)) {
+            $this->dbc->exec("ALTER TABLE posts ADD COLUMN image BLOB");
+            $this->dbc->exec("ALTER TABLE posts ADD COLUMN mime TEXT");
+        }
     }
 
     public function saveComment($postData)
@@ -63,14 +76,16 @@ class aggregator
         }
 
         if ($gameOn) {
-            $stmt = $this->dbc->prepare("INSERT INTO posts (title, file, url) VALUES (?, ?, ?)");
-            $stmt->execute([$title, $haveUpload ? $fileExt : null, $url]);
-            $iid = $this->dbc->lastInsertId();
             if ($haveUpload) {
-                $dest = FILES_PATH . $iid . '.' . $fileExt;
-                if (!move_uploaded_file($fileTmp, $dest)) {
-                    $this->db->report('File upload failed.', 'error');
-                }
+                $mimeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png',
+                            'gif' => 'image/gif', 'svg' => 'image/svg+xml'];
+                $mime = $mimeMap[$fileExt] ?? 'application/octet-stream';
+                $data = file_get_contents($fileTmp);
+                $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$title, $mime, $data, '']);
+            } else {
+                $stmt = $this->dbc->prepare("INSERT INTO posts (title, url) VALUES (?, ?)");
+                $stmt->execute([$title, $url]);
             }
         }
     }
@@ -91,7 +106,7 @@ class aggregator
 
     public function getAllPosts()
     {
-        $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url
+        $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url, (posts.image IS NOT NULL) as has_image
                 FROM posts
                 LEFT JOIN comments ON comments.post = posts.id
                 WHERE comments.id = (
@@ -114,7 +129,7 @@ class aggregator
             $offset    = POST_LIMIT * ($this->page - 1);
             $sqlOffset = 'LIMIT ' . POST_LIMIT . ($this->page > 1 ? ' OFFSET ' . $offset : '');
 
-            $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url
+            $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url, (posts.image IS NOT NULL) as has_image
                     FROM posts
                     LEFT JOIN comments ON comments.post = posts.id
                     WHERE comments.id = (
@@ -129,7 +144,7 @@ class aggregator
             $stmt = $this->dbc->prepare($sql);
             $stmt->execute();
         } else {
-            $stmt = $this->dbc->prepare('SELECT id, title, file, url, date FROM posts WHERE id=?');
+            $stmt = $this->dbc->prepare('SELECT id, title, file, url, date, (image IS NOT NULL) as has_image FROM posts WHERE id=?');
             $stmt->execute([(int) $postid]);
         }
 
@@ -172,10 +187,9 @@ class aggregator
             $postUrlCheck .= '&autoplay=1';
         }
 
-        $postimgExt = $row['file'] ?? '';
-        if (!empty($postimgExt)) {
-            $img = $rowid . '.' . $postimgExt;
-            $src = APP_PATH . 'assets/uploads/' . $img;
+        $hasLocalImage = !empty($row['file']) || !empty($row['has_image']);
+        if ($hasLocalImage) {
+            $src = APP_PATH . 'img.php?id=' . $rowid;
             $postImg = '<a href="' . $src . '" rel="lightbox">'
                      . '<img src="' . $src . '" alt="' . $postTitle . '" loading="lazy" />'
                      . '</a>';
