@@ -35,21 +35,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-<button id="toggle-new" title="new post">+</button>
-
-<form id="new-post" method="post" action="<?= APP_PATH ?>" enctype="multipart/form-data" hidden>
-    <input type="text" name="title" placeholder="title" />
-    <input type="url" name="url" placeholder="url" />
-    <label id="file-label">
-        <span>or pick a file</span>
-        <input type="file" name="file" />
-    </label>
-    <input type="hidden" name="submittedPost" value="1" />
-    <button type="submit">post it</button>
-</form>
+<div id="drawer-wrap">
+    <button id="toggle-new">+ new post</button>
+    <form id="new-post" method="post" action="<?= APP_PATH ?>" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="title" />
+        <input type="url" name="url" placeholder="url" />
+        <label id="file-label">
+            <span>or a file</span>
+            <input type="file" name="file" />
+        </label>
+        <input type="hidden" name="submittedPost" value="1" />
+        <button type="submit">post it</button>
+    </form>
+</div>
 
 <?php
-    echo '<main role="main" id="posts">';
+    $singlePost = isset($postid);
+    if ($singlePost) echo '<a href="' . APP_PATH . '" id="back-link">← all posts</a>';
+    echo '<main role="main" id="posts"' . ($singlePost ? ' class="single"' : '') . '>';
     $agg->getAllOrderedPosts($postid);
     echo '</main>';
 

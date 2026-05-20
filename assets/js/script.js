@@ -6,13 +6,19 @@ window.addEventListener('load', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // new post toggle
+    // new post drawer
     var newForm   = document.getElementById('new-post');
     var toggleBtn = document.getElementById('toggle-new');
     if (newForm && toggleBtn) {
         toggleBtn.addEventListener('click', function () {
-            newForm.hidden = !newForm.hidden;
-            toggleBtn.textContent = newForm.hidden ? '+' : '×';
+            var open = newForm.classList.toggle('open');
+            toggleBtn.textContent = open ? '× close' : '+ new post';
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && newForm.classList.contains('open')) {
+                newForm.classList.remove('open');
+                toggleBtn.textContent = '+ new post';
+            }
         });
     }
 

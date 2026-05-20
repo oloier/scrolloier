@@ -24,32 +24,45 @@ body {
 }
 a { color: orange; }
 
-/* new post toggle */
-#toggle-new {
-    position: fixed;
-    top: .75em;
-    right: .75em;
+/* folder-tab drawer */
+#drawer-wrap {
+    position: sticky;
+    top: 0;
     z-index: 100;
-    width: 2.25em;
-    height: 2.25em;
-    border-radius: 50%;
-    padding: 0;
-    font-size: 1.4em;
-    line-height: 1;
-    box-shadow: 0 2px 8px rgba(0,0,0,.5);
+    pointer-events: none;
 }
-
-/* inline new post form */
+#toggle-new {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 3%;
+    border-radius: 0 0 .5em .5em;
+    padding: .4em 1em;
+    font-size: .85em;
+    box-shadow: 0 2px 6px rgba(0,0,0,.5);
+}
 #new-post {
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     display: flex;
     flex-wrap: wrap;
     gap: .6em;
     align-items: flex-end;
     padding: .75em 3%;
-    background: rgba(0,0,0,.7);
+    background: rgba(0,0,0,.88);
     border-bottom: 1px solid rgba(255,255,255,.08);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .15s ease, transform .2s ease;
 }
-#new-post[hidden] { display: none; }
+#new-post.open {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
+}
 #new-post input[type="text"],
 #new-post input[type="url"] { flex: 1; min-width: 160px; display: block; }
 #new-post input[type="file"] { display: block; }
@@ -271,6 +284,28 @@ dd footer time { font-size: .72em; color: #555; }
 @media (min-width: 48em) {
     #pagination a:first-child, #pagination a:last-child { width: auto; }
     #pagination a { order: 0; }
+}
+
+/* single post view */
+#back-link {
+    display: inline-block;
+    margin: .75em 3% 0;
+    font-size: .85em;
+    color: #888;
+    text-decoration: none;
+}
+#back-link:hover { color: #ddd; }
+#posts.single {
+    grid-template-columns: 1fr;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#posts.single article {
+    aspect-ratio: 16/9;
+}
+#posts.single article img {
+    object-fit: contain;
 }
 
 /* mobile */
