@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="<?= ASSETS_PATH ?>style.css" />
     <link rel="icon" type="image/svg+xml" href="<?= ASSETS_PATH ?>img/logo.svg" />
+    <link rel="alternate" type="application/rss+xml" title="Scrolloier" href="<?= APP_PATH ?>rss.php" />
 </head>
 <body>
 

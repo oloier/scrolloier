@@ -111,14 +111,25 @@ class aggregator
                 $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
                 $stmt->execute([$title, $mime, $data, '']);
             } else {
-                $ext  = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
-                $mime = $mimeMap[$ext] ?? null;
-                if ($mime && ($data = fetchUrl($url))) {
-                    $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([$title, $mime, $data, '']);
+                if (preg_match('/https?:\/\/(?:i\.)?imgur\.com\/([a-zA-Z0-9]+)\.gifv/i', $url, $m)) {
+                    $data = fetchUrl('https://i.imgur.com/' . $m[1] . '.mp4');
+                    if ($data) {
+                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
+                        $stmt->execute([$title, 'video/mp4', $data, '']);
+                    } else {
+                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, url) VALUES (?, ?)");
+                        $stmt->execute([$title, $url]);
+                    }
                 } else {
-                    $stmt = $this->dbc->prepare("INSERT INTO posts (title, url) VALUES (?, ?)");
-                    $stmt->execute([$title, $url]);
+                    $ext  = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+                    $mime = $mimeMap[$ext] ?? null;
+                    if ($mime && ($data = fetchUrl($url))) {
+                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
+                        $stmt->execute([$title, $mime, $data, '']);
+                    } else {
+                        $stmt = $this->dbc->prepare("INSERT INTO posts (title, url) VALUES (?, ?)");
+                        $stmt->execute([$title, $url]);
+                    }
                 }
             }
         }
@@ -140,7 +151,7 @@ class aggregator
 
     public function getAllPosts()
     {
-        $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url, (posts.image IS NOT NULL) as has_image
+        $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url, posts.mime, (posts.image IS NOT NULL) as has_image
                 FROM posts
                 LEFT JOIN comments ON comments.post = posts.id
                 WHERE comments.id = (
@@ -163,7 +174,7 @@ class aggregator
             $offset    = POST_LIMIT * ($this->page - 1);
             $sqlOffset = 'LIMIT ' . POST_LIMIT . ($this->page > 1 ? ' OFFSET ' . $offset : '');
 
-            $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url, (posts.image IS NOT NULL) as has_image
+            $sql = 'SELECT posts.id, posts.date, posts.title, posts.file, posts.url, posts.mime, (posts.image IS NOT NULL) as has_image
                     FROM posts
                     LEFT JOIN comments ON comments.post = posts.id
                     WHERE comments.id = (
@@ -178,7 +189,7 @@ class aggregator
             $stmt = $this->dbc->prepare($sql);
             $stmt->execute();
         } else {
-            $stmt = $this->dbc->prepare('SELECT id, title, file, url, date, (image IS NOT NULL) as has_image FROM posts WHERE id=?');
+            $stmt = $this->dbc->prepare('SELECT id, title, file, url, date, mime, (image IS NOT NULL) as has_image FROM posts WHERE id=?');
             $stmt->execute([(int) $postid]);
         }
 
@@ -220,12 +231,17 @@ class aggregator
         $url  = $row['url'] ?? '';
         $safe = htmlspecialchars($url, ENT_QUOTES);
 
-        $hasLocalImage = !empty($row['file']) || !empty($row['has_image']);
-        if ($hasLocalImage) {
-            $src = APP_PATH . 'img.php?id=' . $rowid;
-            $postImg = '<a href="' . $src . '" rel="lightbox">'
-                     . '<img src="' . $src . '" alt="' . $postTitle . '" loading="lazy" />'
-                     . '</a>';
+        $hasLocalMedia = !empty($row['file']) || !empty($row['has_image']);
+        if ($hasLocalMedia) {
+            $src  = APP_PATH . 'img.php?id=' . $rowid;
+            $mime = $row['mime'] ?? '';
+            if (strpos($mime, 'video/') === 0) {
+                $embedDirect = '<video controls loop playsinline><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></video>';
+            } else {
+                $postImg = '<a href="' . $src . '" rel="lightbox">'
+                         . '<img src="' . $src . '" alt="' . $postTitle . '" loading="lazy" />'
+                         . '</a>';
+            }
         } elseif (!empty($url)) {
             if (preg_match('/https?:\/\/\S+\.(?:png|jpg|jpeg|gif|svg|webp)(\?[^\s]*)?$/i', $url)) {
                 $postImg = '<a class="loader" href="' . $safe . '" rel="lightbox"><img src="' . $safe . '" alt="" loading="lazy" /></a>';
@@ -246,6 +262,9 @@ class aggregator
                 } else {
                     $embedDirect = '<a href="' . $safe . '" class="regular">&#9654; Vimeo</a>';
                 }
+            } elseif (preg_match('/https?:\/\/(?:i\.)?imgur\.com\/([a-zA-Z0-9]+)\.gifv/i', $url, $m)) {
+                $mp4 = htmlspecialchars('https://i.imgur.com/' . $m[1] . '.mp4', ENT_QUOTES);
+                $embedDirect = '<video controls loop playsinline><source src="' . $mp4 . '" type="video/mp4"></video>';
             } else {
                 $meta = $this->getUrlMeta($url);
                 if (!empty($meta['thumbnail'])) {
