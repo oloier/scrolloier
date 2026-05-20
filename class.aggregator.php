@@ -272,8 +272,8 @@ class aggregator
 function parseMarkdown($text)
 {
     $text = htmlspecialchars($text, ENT_QUOTES);
-    $text = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $text);
-    $text = preg_replace('/\*(.+?)\*/s', '<em>$1</em>', $text);
+    $text = preg_replace('/\*(.+?)\*/s', '<strong>$1</strong>', $text);
+    $text = preg_replace('/_(.+?)_/s', '<em>$1</em>', $text);
     $text = preg_replace('/^- (.+)/m', '<li>$1</li>', $text);
     $text = preg_replace('/((?:<li>[^\n]*\n?)+)/', '<ul>$1</ul>', $text);
     return nl2br($text);
