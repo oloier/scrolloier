@@ -7,6 +7,7 @@ define('ASSETS_PATH', APP_PATH . 'assets/');
 define('FILES_LIMIT',   4000000);
 define('FILES_ALLOWED', serialize(['jpg', 'png', 'gif', 'svg', 'jpeg']));
 define('POST_LIMIT', 500);
+define('DELETE_TOKEN', 'scroll-del-7f3a9c');
 
 class aggregator
 {
@@ -62,6 +63,12 @@ class aggregator
             $this->dbc->exec("ALTER TABLE posts ADD COLUMN image BLOB");
             $this->dbc->exec("ALTER TABLE posts ADD COLUMN mime TEXT");
         }
+    }
+
+    public function deletePost($id)
+    {
+        $this->dbc->prepare("DELETE FROM posts WHERE id=?")->execute([$id]);
+        $this->dbc->prepare("DELETE FROM comments WHERE post=?")->execute([$id]);
     }
 
     public function saveComment($postData)
@@ -180,7 +187,8 @@ class aggregator
 
     public function getAllOrderedPosts($postid = null)
     {
-        if (!isset($postid)) {
+        $single = isset($postid);
+        if (!$single) {
             $offset    = POST_LIMIT * ($this->page - 1);
             $sqlOffset = 'LIMIT ' . POST_LIMIT . ($this->page > 1 ? ' OFFSET ' . $offset : '');
 
@@ -204,7 +212,7 @@ class aggregator
         }
 
         while ($row = $stmt->fetch()) {
-            echo $this->renderPostMarkup($row);
+            echo $this->renderPostMarkup($row, $single);
         }
     }
 
@@ -227,7 +235,7 @@ class aggregator
         }
     }
 
-    private function renderPostMarkup($row)
+    private function renderPostMarkup($row, $openComments = false)
     {
         $rowid     = (int) $row['id'];
         $rawTitle  = $row['title'] ?? '';
@@ -309,7 +317,7 @@ class aggregator
                 </dt>
                 <dd>
                     <h3><a href=\"" . APP_PATH . "?post=$rowid\">$titleHtml</a></h3>
-                    <details>
+                    <details" . ($openComments ? ' open' : '') . ">
                         <summary><var $commentClass>$commentsCount</var> comments</summary>
                         <ul>$comments</ul>
                         <form method=\"post\" action=\"" . APP_PATH . "\">
