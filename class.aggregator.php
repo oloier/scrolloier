@@ -178,7 +178,7 @@ class aggregator
             $stmt = $this->dbc->prepare("SELECT COUNT(*) FROM posts WHERE user=?");
             $stmt->execute([$this->user]);
         } else {
-            $stmt = $this->dbc->prepare("SELECT COUNT(*) FROM posts");
+            $stmt = $this->dbc->prepare("SELECT COUNT(*) FROM posts WHERE user IS NULL");
             $stmt->execute();
         }
         return (int) $stmt->fetchColumn();
@@ -209,7 +209,7 @@ class aggregator
         if (!$single) {
             $offset    = POST_LIMIT * ($this->page - 1);
             $sqlOffset = 'LIMIT ' . POST_LIMIT . ($this->page > 1 ? ' OFFSET ' . $offset : '');
-            $where     = $this->user ? 'WHERE user=?' : '';
+            $where     = $this->user ? 'WHERE user=?' : 'WHERE user IS NULL';
             $sql       = "SELECT id, title, file, url, mime, user, (image IS NOT NULL) as has_image,
                                  COALESCE(bumped, date) as date
                           FROM posts $where
