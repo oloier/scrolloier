@@ -70,6 +70,16 @@ document.addEventListener('DOMContentLoaded', function () {
         img.addEventListener('error', function () {
             var art = this.closest('article');
             if (art) art.classList.add('img-dead');
+            var a = this.closest('a[href]');
+            if (a) {
+                var link = document.createElement('a');
+                link.href = a.href;
+                link.className = 'regular';
+                link.textContent = a.href;
+                link.target = '_blank';
+                link.rel = 'noopener';
+                art.appendChild(link);
+            }
         });
     });
 
