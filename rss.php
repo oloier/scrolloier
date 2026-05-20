@@ -13,11 +13,14 @@ $rows  = $agg->getAllPosts();
 
 $feedTitle = 'Scrolloier' . ($rssUser ? ' / ' . $rssUser : '');
 
+$feedSelf = $base . ($rssUser ? 'feed/' . $rssUser : 'rss.php');
+
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-?><rss version="2.0">
+?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
     <title><?= htmlspecialchars($feedTitle) ?></title>
     <link><?= htmlspecialchars($base . ($rssUser ?? '')) ?></link>
+    <atom:link href="<?= htmlspecialchars($feedSelf) ?>" rel="self" type="application/rss+xml" />
     <description>shared stuff</description>
 <?php foreach ($rows as $row):
     $id      = (int) $row['id'];
