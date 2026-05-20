@@ -18,7 +18,7 @@ td, th { padding: 0; }
 
 /* base */
 body {
-    background: #333 url('img/bg2.png') repeat;
+    background: #333 url('/assets/img/bg4.png') repeat;
     color: #ddd;
     margin-bottom: 1.5em;
 }
