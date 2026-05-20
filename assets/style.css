@@ -102,6 +102,23 @@ dl {
     overflow: hidden;
 }
 
+/* new-since-last-visit badge */
+.item.is-new { border-color: crimson; }
+.item.is-new::before {
+    content: 'new';
+    position: absolute;
+    top: .4em;
+    right: .4em;
+    background: crimson;
+    color: #fff;
+    font: bold .65em/1 sans-serif;
+    padding: .25em .5em;
+    border-radius: .2em;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    z-index: 1;
+}
+
 /* permalinks */
 dd .permalink {
     display: none;

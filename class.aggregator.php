@@ -43,6 +43,7 @@ class aggregator
         $comment = nl2br(htmlspecialchars($postData['comment'] ?? ''));
         $stmt = $this->dbc->prepare("INSERT INTO comments (post, name, comment) VALUES (?, ?, ?)");
         $stmt->execute([$postid, $name, $comment]);
+        return ['name' => $name, 'comment' => $comment];
     }
 
     public function savePost($postData, $filesArray = [])
@@ -175,6 +176,7 @@ class aggregator
         $rowid     = (int) $row['id'];
         $postTitle = htmlspecialchars($row['title'] ?? '');
         $postDate  = $row['date'] ?? '';
+        $postDateISO = $postDate ? str_replace(' ', 'T', $postDate) : '';
         $postImg   = '';
         $thumbnail = '';
         $embedDirect = '';
@@ -223,7 +225,7 @@ class aggregator
                 </dt>
                 <dd>
                     <h3>$postTitle</h3>
-                    <time datetime=\"$postDate\">$postDate</time>
+                    <time datetime=\"$postDateISO\">$postDate</time>
                     <details>
                         <summary><var $commentClass>$commentsCount</var> Comments</summary>
                         <ul>$comments</ul>

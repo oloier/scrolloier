@@ -7,7 +7,12 @@ $agg = new aggregator($page);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['submittedComment'])) {
-        $agg->saveComment($_POST);
+        $saved = $agg->saveComment($_POST);
+        if (!empty($_POST['_ajax'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => true] + $saved);
+            exit;
+        }
         header('Location: ' . APP_PATH);
         exit;
     }
