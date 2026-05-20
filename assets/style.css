@@ -1,20 +1,12 @@
-/* minimal reset */
+/* reset */
 *, *::before, *::after { box-sizing: border-box; }
 html { font: 14px sans-serif; }
 body { margin: 0; }
-a { background-color: transparent; }
-img { border: 0; }
-svg:not(:root) { overflow: hidden; }
 h3, h4 { margin: 0 0 .7em; text-align: left; }
 button, input, select, textarea { color: inherit; font: inherit; margin: 0; }
-button { cursor: pointer; overflow: visible; }
-button, select { text-transform: none; }
-input { line-height: normal; }
+button { cursor: pointer; }
 textarea { overflow: auto; }
 dl, dt, dd, ul { margin: 0; padding: 0; }
-pre { overflow: auto; }
-table { border-collapse: collapse; border-spacing: 0; }
-td, th { padding: 0; }
 
 /* base */
 body {
@@ -50,7 +42,8 @@ a { color: orange; }
     overflow: hidden;
     max-height: 0;
     padding: 0 1em;
-    background: rgba(0,0,0,.92);
+    background: rgba(0,0,0,.8);
+    backdrop-filter: blur(10px);
     border-left: 1px solid rgba(255,255,255,.1);
     border-radius: 0 0 0 .5em;
     transition: max-height .25s ease, padding .2s ease;
@@ -89,9 +82,7 @@ form input, form textarea {
     border: 1px solid black;
     border-radius: .3em;
 }
-form input + input { margin-top: 1em; }
 form textarea { height: 5em; margin: .5em 0; }
-form > * { border-radius: .3em; }
 
 /* dialogs */
 dialog {
@@ -119,7 +110,7 @@ dialog::backdrop { background: rgba(0,0,0,.75); }
     max-height: 90vh;
 }
 
-/* main posts layout */
+/* posts grid */
 #posts {
     margin: 3%;
     display: grid;
@@ -132,6 +123,7 @@ dl {
     border: 1px solid rgba(0,0,0,.3);
     border-radius: .5em;
     background: rgba(0,0,0,.4);
+    backdrop-filter: blur(10px);
     overflow: hidden;
 }
 
@@ -152,7 +144,7 @@ dl {
     z-index: 1;
 }
 
-/* links and embeds */
+/* article media */
 article {
     text-align: center;
     position: relative;
@@ -310,12 +302,8 @@ dd footer time { font-size: .72em; color: #555; }
     margin-left: auto;
     margin-right: auto;
 }
-#posts.single article {
-    aspect-ratio: 16/9;
-}
-#posts.single article img {
-    object-fit: contain;
-}
+#posts.single article { aspect-ratio: 16/9; }
+#posts.single article img { object-fit: contain; }
 
 /* mobile */
 @media (max-width: 600px) {
@@ -324,8 +312,6 @@ dd footer time { font-size: .72em; color: #555; }
     #pagination { width: 100%; }
     #pagination a { padding: 1.25em 1.5em; }
     #new-post { gap: .5em; }
-    #new-post input[type="text"],
-    #new-post input[type="url"] { min-width: 100%; }
 }
 
 @keyframes shake {
