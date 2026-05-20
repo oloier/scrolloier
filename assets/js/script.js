@@ -9,18 +9,32 @@ document.addEventListener('DOMContentLoaded', function () {
     // new post drawer
     var newForm   = document.getElementById('new-post');
     var toggleBtn = document.getElementById('toggle-new');
+    function closeDrawer() {
+        newForm.classList.remove('open');
+        toggleBtn.textContent = '+ new post';
+    }
     if (newForm && toggleBtn) {
         toggleBtn.addEventListener('click', function () {
             var open = newForm.classList.toggle('open');
             toggleBtn.textContent = open ? '× close' : '+ new post';
         });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && newForm.classList.contains('open')) {
-                newForm.classList.remove('open');
-                toggleBtn.textContent = '+ new post';
+        document.addEventListener('click', function (e) {
+            if (newForm.classList.contains('open') && !newForm.contains(e.target) && !toggleBtn.contains(e.target)) {
+                closeDrawer();
             }
         });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && newForm.classList.contains('open')) closeDrawer();
+        });
     }
+
+    // dead image detection
+    document.querySelectorAll('article img').forEach(function (img) {
+        img.addEventListener('error', function () {
+            var art = this.closest('article');
+            if (art) art.classList.add('img-dead');
+        });
+    });
 
     // image lightbox
     var lightbox = document.getElementById('lightbox');

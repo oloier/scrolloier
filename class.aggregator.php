@@ -220,7 +220,9 @@ class aggregator
     private function renderPostMarkup($row)
     {
         $rowid     = (int) $row['id'];
-        $postTitle = htmlspecialchars($row['title'] ?? '');
+        $rawTitle  = $row['title'] ?? '';
+        $postTitle = htmlspecialchars($rawTitle);
+        $titleHtml = $postTitle !== '' ? $postTitle : '<span class="untitled">untitled</span>';
         $postDate  = $row['date'] ?? '';
         $postDateISO = $postDate ? str_replace(' ', 'T', $postDate) : '';
         $postImg   = '';
@@ -296,7 +298,7 @@ class aggregator
                     </article>
                 </dt>
                 <dd>
-                    <h3><a href=\"" . APP_PATH . "?post=$rowid\">$postTitle</a></h3>
+                    <h3><a href=\"" . APP_PATH . "?post=$rowid\">$titleHtml</a></h3>
                     <details>
                         <summary><var $commentClass>$commentsCount</var> comments</summary>
                         <ul>$comments</ul>
