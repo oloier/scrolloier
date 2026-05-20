@@ -217,10 +217,8 @@ class aggregator
         $embedDirect = '';
         $commentClass = '';
 
-        $postUrlCheck = $row['url'] ?? '';
-        if ($postUrlCheck && strpos($postUrlCheck, 'youtube') !== false) {
-            $postUrlCheck .= '&autoplay=1';
-        }
+        $url  = $row['url'] ?? '';
+        $safe = htmlspecialchars($url, ENT_QUOTES);
 
         $hasLocalImage = !empty($row['file']) || !empty($row['has_image']);
         if ($hasLocalImage) {
@@ -228,14 +226,34 @@ class aggregator
             $postImg = '<a href="' . $src . '" rel="lightbox">'
                      . '<img src="' . $src . '" alt="' . $postTitle . '" loading="lazy" />'
                      . '</a>';
-        } elseif (!empty($postUrlCheck)) {
-            $postUrl = embed($postUrlCheck);
-            if (is_array($postUrl)) {
-                $embedHTML = htmlspecialchars(stripcslashes($postUrl['html']), ENT_QUOTES);
-                $thumb     = htmlspecialchars($postUrl['thumbnail_url'] ?? '');
-                $thumbnail = '<img src="' . $thumb . '" alt="" data-embed="' . $embedHTML . '" /><a>&#9654;</a>';
-            } elseif (!empty($postUrl)) {
-                $embedDirect = stripcslashes($postUrl);
+        } elseif (!empty($url)) {
+            if (preg_match('/https?:\/\/\S+\.(?:png|jpg|jpeg|gif|svg|webp)(\?[^\s]*)?$/i', $url)) {
+                $postImg = '<a class="loader" href="' . $safe . '" rel="lightbox"><img src="' . $safe . '" alt="" loading="lazy" /></a>';
+            } elseif (preg_match('/https?:\/\/\S+\.(?:mp4|webm|ogg)(\?[^\s]*)?$/i', $url)) {
+                $embedDirect = '<video controls><source src="' . $safe . '"></video>';
+            } elseif (preg_match('/(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/', $url, $m)) {
+                $id    = $m[1];
+                $embed = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $id . '?autoplay=1" frameborder="0" allowfullscreen></iframe>';
+                $thumb = 'https://img.youtube.com/vi/' . $id . '/hqdefault.jpg';
+                $thumbnail = '<img src="' . $thumb . '" alt="" data-embed="' . htmlspecialchars($embed, ENT_QUOTES) . '" loading="lazy" /><a>&#9654;</a>';
+            } elseif (preg_match('/vimeo\.com\/(\d+)/', $url, $m)) {
+                $id    = $m[1];
+                $embed = '<iframe src="https://player.vimeo.com/video/' . $id . '?autoplay=1" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
+                $meta  = $this->getUrlMeta($url);
+                if (!empty($meta['thumbnail'])) {
+                    $thumb = htmlspecialchars($meta['thumbnail'], ENT_QUOTES);
+                    $thumbnail = '<img src="' . $thumb . '" alt="" data-embed="' . htmlspecialchars($embed, ENT_QUOTES) . '" loading="lazy" /><a>&#9654;</a>';
+                } else {
+                    $embedDirect = '<a href="' . $safe . '" class="regular">&#9654; Vimeo</a>';
+                }
+            } else {
+                $meta = $this->getUrlMeta($url);
+                if (!empty($meta['thumbnail'])) {
+                    $thumb = htmlspecialchars($meta['thumbnail'], ENT_QUOTES);
+                    $thumbnail = '<a href="' . $safe . '" target="_blank" rel="noopener"><img src="' . $thumb . '" alt="" loading="lazy" /></a>';
+                } else {
+                    $embedDirect = '<a href="' . $safe . '" class="regular">' . htmlspecialchars($url) . '</a>';
+                }
             }
         }
 
@@ -274,6 +292,46 @@ class aggregator
                 </dd>
             </dl>";
     }
+    private function getUrlMeta($url)
+    {
+        $stmt = $this->dbc->prepare("SELECT thumbnail, title, fetched FROM url_cache WHERE url = ?");
+        $stmt->execute([$url]);
+        $cached = $stmt->fetch();
+        if ($cached && $cached['fetched'] > time() - 604800) {
+            return $cached;
+        }
+
+        $thumbnail = null;
+        $title     = null;
+
+        if (strpos($url, 'soundcloud.com') !== false) {
+            $json = fetchUrl('https://soundcloud.com/oembed?format=json&url=' . urlencode($url));
+            if ($json && ($data = json_decode($json, true))) {
+                $thumbnail = $data['thumbnail_url'] ?? null;
+                $title     = $data['title'] ?? null;
+            }
+        } else {
+            $html = fetchUrl($url);
+            if ($html) {
+                foreach ([
+                    '/<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']/i',
+                    '/<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']/i',
+                ] as $re) {
+                    if (preg_match($re, $html, $m)) { $thumbnail = $m[1]; break; }
+                }
+                foreach ([
+                    '/<meta[^>]+property=["\']og:title["\'][^>]+content=["\']([^"\']+)["\']/i',
+                    '/<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:title["\']/i',
+                ] as $re) {
+                    if (preg_match($re, $html, $m)) { $title = html_entity_decode($m[1], ENT_QUOTES); break; }
+                }
+            }
+        }
+
+        $stmt = $this->dbc->prepare("INSERT OR REPLACE INTO url_cache (url, thumbnail, title, fetched) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$url, $thumbnail, $title, time()]);
+        return ['thumbnail' => $thumbnail, 'title' => $title];
+    }
 }
 
 function fetchUrl($url)
@@ -303,32 +361,3 @@ function parseMarkdown($text)
     return nl2br($text);
 }
 
-function embed($url)
-{
-    if (empty($url)) return '';
-
-    if (preg_match('/https?:\/\/\S+\.(?:png|jpg|jpeg|gif|svg)(\?[^\s]*)?$/i', $url)) {
-        $safe = htmlspecialchars($url, ENT_QUOTES);
-        return '<a class="loader" href="' . $safe . '" rel="lightbox"><img src="' . $safe . '" alt="" loading="lazy" /></a>';
-    }
-
-    if (preg_match('/https?:\/\/\S+\.(?:mp4|webm|ogg)(\?[^\s]*)?$/i', $url)) {
-        $safe = htmlspecialchars($url, ENT_QUOTES);
-        return '<video controls><source src="' . $safe . '"></video>';
-    }
-
-    if (preg_match('/(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/', $url, $m)) {
-        $id    = $m[1];
-        $thumb = 'https://img.youtube.com/vi/' . $id . '/hqdefault.jpg';
-        $embed = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $id . '?autoplay=1" frameborder="0" allowfullscreen></iframe>';
-        return '<img src="' . $thumb . '" alt="" data-embed="' . htmlspecialchars($embed, ENT_QUOTES) . '" loading="lazy" /><a>&#9654;</a>';
-    }
-
-    if (preg_match('/vimeo\.com\/(\d+)/', $url, $m)) {
-        $safe  = htmlspecialchars($url, ENT_QUOTES);
-        return '<a href="' . $safe . '" class="regular">&#9654; Vimeo</a>';
-    }
-
-    $safe = htmlspecialchars($url, ENT_QUOTES);
-    return '<a href="' . $safe . '" class="regular">' . htmlspecialchars($url) . '</a>';
-}
