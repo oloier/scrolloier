@@ -142,18 +142,6 @@ dl {
     z-index: 1;
 }
 
-/* permalinks */
-dd .permalink {
-    display: none;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    color: crimson;
-    font: bold 1.6em verdana, sans-serif;
-    text-decoration: none;
-}
-dl:hover .permalink { display: inline-block; }
-
 /* links and embeds */
 article {
     text-align: center;
@@ -197,25 +185,63 @@ article img + a {
 }
 
 /* comments */
-dd { padding: 1em; }
-dd form { text-align: right; }
-dd ul { margin: 1.5em 0; list-style: none; }
-dd ul > li + li {
-    margin-top: .75em;
-    padding-top: .75em;
-    border-top: 1px solid rgba(255,255,255,.3);
+dd { padding: .75em 1em 0; }
+dd h3 { margin-bottom: .4em; }
+dd h3 a { color: #ddd; text-decoration: none; }
+dd h3 a:hover { color: orange; }
+
+dd details { border-top: 1px solid rgba(255,255,255,.07); margin-top: .25em; }
+dd details summary {
+    cursor: pointer;
+    padding: .55em 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: .4em;
+    user-select: none;
+    font-size: .85em;
+    color: #888;
 }
-dd li b { display: block; margin-bottom: .3em; color: #777; }
-dd li p { margin: 0; font-size: .9em; }
+dd details summary::-webkit-details-marker { display: none; }
+dd details summary::after {
+    content: '›';
+    margin-left: auto;
+    font-size: 1.1em;
+    line-height: 1;
+    display: inline-block;
+    transition: transform .18s ease;
+}
+dd details[open] summary::after { transform: rotate(90deg); }
+dd details summary:hover { color: #bbb; }
+
 dd summary var {
     font-style: normal;
     color: #fff;
     display: inline-block;
-    padding: 0 .5em;
+    padding: .1em .45em;
     border-radius: .2em;
+    background: rgba(255,255,255,.08);
 }
-summary { padding: .25em 0; }
-dd summary var.active { font-weight: bold; background-color: seagreen; }
+dd summary var.active { background: seagreen; }
+
+dd ul { margin: .5em 0 1em; padding: 0; list-style: none; }
+dd ul > li + li {
+    margin-top: .6em;
+    padding-top: .6em;
+    border-top: 1px solid rgba(255,255,255,.07);
+}
+dd li b { display: block; margin-bottom: .2em; color: #666; font-size: .8em; }
+dd li p { margin: 0; font-size: .88em; }
+dd form { margin-top: .75em; padding-top: .75em; border-top: 1px solid rgba(255,255,255,.07); }
+dd form textarea { margin: .4em 0; }
+
+dd footer {
+    padding: .4em 0 .6em;
+    text-align: right;
+    border-top: 1px solid rgba(255,255,255,.05);
+    margin-top: .5em;
+}
+dd footer time { font-size: .72em; color: #555; }
 
 /* pagination */
 #pagination {

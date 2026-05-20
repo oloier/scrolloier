@@ -252,20 +252,18 @@ class aggregator
                     </article>
                 </dt>
                 <dd>
-                    <h3>$postTitle</h3>
-                    <time datetime=\"$postDateISO\">$postDate</time>
+                    <h3><a href=\"" . APP_PATH . "?post=$rowid\">$postTitle</a></h3>
                     <details>
-                        <summary><var $commentClass>$commentsCount</var> Comments</summary>
+                        <summary><var $commentClass>$commentsCount</var> comments</summary>
                         <ul>$comments</ul>
                         <form method=\"post\" action=\"" . APP_PATH . "\">
-                            <h4>Post Comment</h4>
                             <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" required />
                             <textarea name=\"comment\" placeholder=\"comment\" maxlength=\"1000\" required></textarea>
                             <input type=\"hidden\" name=\"submittedComment\" value=\"$rowid\" />
-                            <button type=\"submit\">Post Comment</button>
+                            <button type=\"submit\">comment</button>
                         </form>
                     </details>
-                    <a href=\"" . APP_PATH . "?post=$rowid\" class=\"permalink\">#</a>
+                    <footer><time datetime=\"$postDateISO\">$postDate</time></footer>
                 </dd>
             </dl>";
     }
