@@ -68,7 +68,7 @@ class aggregator
     {
         $postid  = (int) $postData['submittedComment'];
         $name    = htmlspecialchars($postData['name'] ?? '');
-        $comment = nl2br(htmlspecialchars($postData['comment'] ?? ''));
+        $comment = parseMarkdown($postData['comment'] ?? '');
         $stmt = $this->dbc->prepare("INSERT INTO comments (post, name, comment) VALUES (?, ?, ?)");
         $stmt->execute([$postid, $name, $comment]);
         return ['name' => $name, 'comment' => $comment];
@@ -267,6 +267,16 @@ class aggregator
                 </dd>
             </dl>";
     }
+}
+
+function parseMarkdown($text)
+{
+    $text = htmlspecialchars($text, ENT_QUOTES);
+    $text = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $text);
+    $text = preg_replace('/\*(.+?)\*/s', '<em>$1</em>', $text);
+    $text = preg_replace('/^- (.+)/m', '<li>$1</li>', $text);
+    $text = preg_replace('/((?:<li>[^\n]*\n?)+)/', '<ul>$1</ul>', $text);
+    return nl2br($text);
 }
 
 function embed($url)
