@@ -1,15 +1,15 @@
 <?php
 
-// Routing
-$_basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+require_once('class.aggregator.php');
+
+// Routing — use APP_PATH (hardcoded) rather than SCRIPT_NAME (unreliable with try_files)
+$_basePath = rtrim(APP_PATH, '/');
 $_uriPath  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $_path     = substr($_uriPath, strlen($_basePath));
 $_segs     = array_values(array_filter(explode('/', ltrim($_path, '/'))));
 
 $routeUser   = null;
 $routePostId = null;
-
-require_once('class.aggregator.php');
 
 // /feed/username  → RSS
 if (($_segs[0] ?? '') === 'feed' && !empty($_segs[1]) && in_array($_segs[1], USERS)) {
