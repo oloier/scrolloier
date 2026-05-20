@@ -11,7 +11,7 @@ $rows = $agg->getAllPosts();
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?><rss version="2.0">
 <channel>
-    <title>Discovery Zone</title>
+    <title>Scrolloier</title>
     <link><?= htmlspecialchars($base) ?></link>
     <description>shared stuff</description>
 <?php foreach ($rows as $row):
