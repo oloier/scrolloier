@@ -25,19 +25,18 @@ body {
 a { color: orange; }
 
 /* folder-tab drawer */
+/* folder-tab drawer */
 #drawer-wrap {
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 100;
+    right: 3%;
+    z-index: 101;
     pointer-events: none;
-    display: flex;
-    justify-content: flex-end;
 }
 #toggle-new {
     pointer-events: auto;
     display: inline-flex;
     align-items: center;
-    margin-right: 3%;
     border-radius: 0 0 .5em .5em;
     padding: .4em 1em;
     font-size: .85em;
@@ -45,19 +44,21 @@ a { color: orange; }
 }
 #new-post {
     pointer-events: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
+    position: fixed;
+    top: 0;
     right: 0;
+    width: 300px;
+    z-index: 100;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: .6em;
-    align-items: flex-end;
-    padding: .75em 3%;
-    background: rgba(0,0,0,.88);
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    padding: 1em;
+    background: rgba(0,0,0,.92);
+    border-left: 1px solid rgba(255,255,255,.1);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    border-radius: 0 0 0 .5em;
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-100%);
     transition: opacity .15s ease, transform .2s ease;
 }
 #new-post.open {
@@ -66,8 +67,8 @@ a { color: orange; }
     transform: translateY(0);
 }
 #new-post input[type="text"],
-#new-post input[type="url"] { flex: 1; min-width: 160px; display: block; }
-#new-post input[type="file"] { display: block; }
+#new-post input[type="url"],
+#new-post input[type="file"] { display: block; width: 100%; }
 #file-label { font-size: .85em; color: #aaa; cursor: pointer; }
 #file-label span { display: block; margin-bottom: .25em; }
 
