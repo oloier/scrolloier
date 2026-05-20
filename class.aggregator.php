@@ -103,16 +103,23 @@ class aggregator
         }
 
         if ($gameOn) {
+            $mimeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png',
+                        'gif' => 'image/gif', 'svg' => 'image/svg+xml', 'webp' => 'image/webp'];
             if ($haveUpload) {
-                $mimeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png',
-                            'gif' => 'image/gif', 'svg' => 'image/svg+xml'];
                 $mime = $mimeMap[$fileExt] ?? 'application/octet-stream';
                 $data = file_get_contents($fileTmp);
                 $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
                 $stmt->execute([$title, $mime, $data, '']);
             } else {
-                $stmt = $this->dbc->prepare("INSERT INTO posts (title, url) VALUES (?, ?)");
-                $stmt->execute([$title, $url]);
+                $ext  = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+                $mime = $mimeMap[$ext] ?? null;
+                if ($mime && ($data = fetchUrl($url))) {
+                    $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$title, $mime, $data, '']);
+                } else {
+                    $stmt = $this->dbc->prepare("INSERT INTO posts (title, url) VALUES (?, ?)");
+                    $stmt->execute([$title, $url]);
+                }
             }
         }
     }
@@ -267,6 +274,23 @@ class aggregator
                 </dd>
             </dl>";
     }
+}
+
+function fetchUrl($url)
+{
+    $curl = curl_init($url);
+    if (!$curl) return false;
+    curl_setopt_array($curl, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_USERAGENT      => 'Mozilla/5.0',
+        CURLOPT_SSL_VERIFYPEER => true,
+    ]);
+    $data = curl_exec($curl);
+    $err  = curl_errno($curl);
+    curl_close($curl);
+    return $err ? false : $data;
 }
 
 function parseMarkdown($text)
