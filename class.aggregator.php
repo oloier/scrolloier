@@ -26,6 +26,34 @@ class aggregator
 
     private function migrate()
     {
+        $this->dbc->exec("
+            CREATE TABLE IF NOT EXISTS posts (
+                id    INTEGER PRIMARY KEY NOT NULL,
+                date  REAL    DEFAULT (datetime('now','localtime')),
+                title TEXT    NOT NULL,
+                file  TEXT    NULL,
+                url   TEXT    NULL,
+                image BLOB    NULL,
+                mime  TEXT    NULL
+            )
+        ");
+        $this->dbc->exec("
+            CREATE TABLE IF NOT EXISTS comments (
+                id      INTEGER PRIMARY KEY NOT NULL,
+                post    INTEGER NOT NULL,
+                date    REAL    DEFAULT (datetime('now','localtime')),
+                name    TEXT    NOT NULL,
+                comment TEXT    NOT NULL
+            )
+        ");
+        $this->dbc->exec("
+            CREATE TABLE IF NOT EXISTS url_cache (
+                url       TEXT    PRIMARY KEY NOT NULL,
+                thumbnail TEXT    NULL,
+                title     TEXT    NULL,
+                fetched   INTEGER NOT NULL DEFAULT 0
+            )
+        ");
         $cols = array_column(
             $this->dbc->query("PRAGMA table_info(posts)")->fetchAll(),
             'name'
