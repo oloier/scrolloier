@@ -24,11 +24,37 @@ body {
 }
 a { color: orange; }
 
-/* header */
-header { background: rgba(0,0,0,.8); padding: 1% 3%; }
-#logo { display: inline-block; }
-#logo img { width: 50px; display: block; }
-#add { float: right; }
+/* new post toggle */
+#toggle-new {
+    position: fixed;
+    top: .75em;
+    right: .75em;
+    z-index: 100;
+    width: 2.25em;
+    height: 2.25em;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 1.4em;
+    line-height: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,.5);
+}
+
+/* inline new post form */
+#new-post {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6em;
+    align-items: flex-end;
+    padding: .75em 3%;
+    background: rgba(0,0,0,.7);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+#new-post[hidden] { display: none; }
+#new-post input[type="text"],
+#new-post input[type="url"] { flex: 1; min-width: 160px; display: block; }
+#new-post input[type="file"] { display: block; }
+#file-label { font-size: .85em; color: #aaa; cursor: pointer; }
+#file-label span { display: block; margin-bottom: .25em; }
 
 /* buttons */
 button, .button {
@@ -68,9 +94,6 @@ dialog {
     max-width: 90vw;
 }
 dialog::backdrop { background: rgba(0,0,0,.75); }
-#new form { margin: 0; }
-#new details { padding: 1em 0; }
-#new button[type="button"] { background: #555; margin-left: .5em; }
 
 #lightbox {
     background: #000;
@@ -226,12 +249,13 @@ dd summary var.active { font-weight: bold; background-color: seagreen; }
 
 /* mobile */
 @media (max-width: 600px) {
-    button { display: block; width: 100%; padding: 1.5em; }
     input, textarea { padding: .75em .5em; }
     dialog { min-width: 0; width: 95vw; }
-    #new button[type="button"] { margin-left: 0; margin-top: .5em; }
     #pagination { width: 100%; }
     #pagination a { padding: 1.25em 1.5em; }
+    #new-post { gap: .5em; }
+    #new-post input[type="text"],
+    #new-post input[type="url"] { min-width: 100%; }
 }
 
 /* loading spinner */
