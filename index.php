@@ -5,6 +5,12 @@ $page   = $_GET['page'] ?? null;
 
 $agg = new aggregator($page);
 
+if (isset($_GET['delete']) && ($_GET['token'] ?? '') === DELETE_TOKEN) {
+    $agg->deletePost((int) $_GET['delete']);
+    header('Location: ' . APP_PATH);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['submittedComment'])) {
         $saved = $agg->saveComment($_POST);
@@ -42,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
 <div id="drawer-wrap">
-    <button id="toggle-new">+ new post</button>
     <form id="new-post" method="post" action="<?= APP_PATH ?>" enctype="multipart/form-data">
         <input type="text" name="title" placeholder="title" />
         <input type="url" name="url" placeholder="url" />
@@ -53,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="hidden" name="submittedPost" value="1" />
         <button type="submit">post it</button>
     </form>
+    <button id="toggle-new">+ new post</button>
 </div>
 
 <?php
