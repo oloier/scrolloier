@@ -183,6 +183,7 @@ article.item {
 }
 
 /* article media */
+figure { margin: 0; }
 figure {
     text-align: center;
     position: relative;
@@ -239,7 +240,7 @@ figure img + a::before {
 }
 
 /* comments */
-article.item > :not(figure) { padding: .75em 1em 0; }
+article.item > div { padding: .75em 1em; }
 article.item h2 { margin-bottom: .4em; }
 article.item h2 a { color: var(--text); text-decoration: none; }
 article.item h2 a:hover { color: var(--link); }

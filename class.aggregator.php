@@ -327,18 +327,20 @@ class aggregator
                 <figure>
                     $thumbnail $embedDirect $postImg
                 </figure>
-                <h2><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h2>
-                <details" . ($openComments ? ' open' : '') . ">
-                    <summary>" . ($commentsCount === 0 ? 'add comment' : "<var>$commentsCount</var> comments") . "</summary>
-                    <ul>$comments</ul>
-                    <form method=\"post\" action=\"" . APP_PATH . "\">
-                        <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" />
-                        <textarea name=\"comment\" placeholder=\"comment\" maxlength=\"1000\" required></textarea>
-                        <input type=\"hidden\" name=\"submittedComment\" value=\"$rowid\" />
-                        <button type=\"submit\">comment</button>
-                    </form>
-                </details>
-                <footer><time datetime=\"$postDateISO\">$postDate</time>$userHtml</footer>
+                <div>
+                    <h2><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h2>
+                    <details" . ($openComments ? ' open' : '') . ">
+                        <summary>" . ($commentsCount === 0 ? 'add comment' : "<var>$commentsCount</var> comments") . "</summary>
+                        <ul>$comments</ul>
+                        <form method=\"post\" action=\"" . APP_PATH . "\">
+                            <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" />
+                            <textarea name=\"comment\" placeholder=\"comment\" maxlength=\"1000\" required></textarea>
+                            <input type=\"hidden\" name=\"submittedComment\" value=\"$rowid\" />
+                            <button type=\"submit\">comment</button>
+                        </form>
+                    </details>
+                    <footer><time datetime=\"$postDateISO\">$postDate</time>$userHtml</footer>
+                </div>
             </article>";
     }
     private static function fetchUrl($url)
