@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var details = form.closest('details');
                 var ul  = details.querySelector('ul');
                 var li  = document.createElement('li');
-                li.innerHTML = '<b>' + res.name + '</b><p>' + res.comment + '</p>';
+                li.innerHTML = '<b>' + res.name + '</b>' + res.comment;
                 ul.appendChild(li);
                 var counter = details.querySelector('summary var');
                 counter.textContent = parseInt(counter.textContent) + 1;
