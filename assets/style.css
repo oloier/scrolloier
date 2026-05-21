@@ -240,7 +240,7 @@ figure img + a::before {
 }
 
 /* comments */
-article.item > div { padding: .75em 1em; }
+article.item > div { padding: .75em 1em 0; }
 article.item h2 { margin-bottom: .4em; }
 article.item h2 a { color: var(--text); text-decoration: none; }
 article.item h2 a:hover { color: var(--link); }
