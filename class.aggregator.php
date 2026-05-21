@@ -330,7 +330,7 @@ class aggregator
                     </article>
                 </dt>
                 <dd>
-                    <h3><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h3>
+                    <h2><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h2>
                     <details" . ($openComments ? ' open' : '') . ">
                         <summary>" . ($commentsCount === 0 ? 'add comment' : "<var $commentClass>$commentsCount</var> comments") . "</summary>
                         <ul>$comments</ul>
