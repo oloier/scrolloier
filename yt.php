@@ -26,6 +26,9 @@ if (file_exists($cacheFile) && time() - filemtime($cacheFile) < $cacheTTL) {
     file_put_contents($cacheFile, $raw);
 }
 
+header('Content-Type: application/rss+xml; charset=utf-8');
+
+libxml_use_internal_errors(true);
 $atom = simplexml_load_string($raw);
 if (!$atom) { http_response_code(502); exit('failed to parse feed'); }
 
@@ -33,8 +36,6 @@ $NS_YT    = 'http://www.youtube.com/xml/schemas/2015';
 $NS_MEDIA = 'http://search.yahoo.com/mrss/';
 
 $channelTitle = (string) $atom->title;
-
-header('Content-Type: application/rss+xml; charset=utf-8');
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
