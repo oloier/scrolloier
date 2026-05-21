@@ -64,13 +64,13 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $pubDate = date('r', strtotime((string) $entry->published));
     $media   = $entry->children($NS_MEDIA)->group;
     $desc    = $media ? htmlspecialchars((string) $media->description) : '';
-    $watch   = $base . '?v=' . $vid;
+    $watch   = 'https://www.youtube.com/watch?v=' . $vid;
     $embed   = '<iframe width="560" height="285" src="https://www.youtube.com/embed/' . $vid . '" frameborder="0" allowfullscreen="allowfullscreen"></iframe>';
 ?>
 <item>
 <title><?= htmlspecialchars($title) ?></title>
 <link><?= $watch ?></link>
-<guid isPermaLink="false">https://www.youtube.com/watch?v=<?= htmlspecialchars($vid) ?></guid>
+<guid isPermaLink="true"><?= $watch ?></guid>
 <pubDate><?= $pubDate ?></pubDate>
 <description><![CDATA[<?= $desc ? '<p>' . nl2br($desc) . '</p>' : '' ?>]]></description>
 <content:encoded><![CDATA[<?= $embed ?><?= $desc ? '<p>' . nl2br($desc) . '</p>' : '' ?>]]></content:encoded>
