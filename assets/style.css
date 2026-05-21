@@ -252,14 +252,17 @@ dd h3 .untitled { color: var(--text-dim); font-style: italic; }
 dd details { border-top: 1px solid var(--border); margin-top: .25em; }
 dd details summary {
     cursor: pointer;
-    padding: .55em 0;
+    padding: .35em .75em;
     list-style: none;
     display: flex;
     align-items: center;
     gap: .4em;
     user-select: none;
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
     color: var(--text-muted);
+    background: var(--bubble);
+    border-radius: .3em;
+    margin: .4em 0;
 }
 dd details summary::-webkit-details-marker { display: none; }
 dd details summary::after {
