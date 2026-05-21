@@ -48,7 +48,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $pubDate = date('r', strtotime((string) $entry->published));
     $media   = $entry->children($NS_MEDIA)->group;
     $desc    = $media ? htmlspecialchars((string) $media->description) : '';
-    $embed   = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe>';
+    $embed   = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '?origin=https://oloier.com" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
 ?>
 <item>
 <title><?= htmlspecialchars($title) ?></title>
