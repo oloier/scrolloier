@@ -280,11 +280,11 @@ dd summary var {
 }
 dd summary var.active { background: var(--accent); color: #000; }
 
-dd ul { margin: .5em 0 1em; padding: 0; list-style: none; }
-dd ul > li + li {
+dd ul { margin:1em 0 0 1em; padding: 0; list-style: none; }
+dd ul > li {
     margin-top: .6em;
-    padding-top: .6em;
-    border-top: 1px solid var(--border);
+    border-left: 5px solid var(--border);
+    padding-left: .5em
 }
 dd li b { color: var(--text-muted); }
 dd li b::after { content: ': '; font-weight: normal; }
