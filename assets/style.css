@@ -1,6 +1,6 @@
 :root {
     --accent:       #e8a020;
-    --secondary:   #555a;
+    --secondary:    #555a;
     --bg:           radial-gradient(ellipse at 50% 0%, #26210e 0%, #111 65%);
     --bg-card:      rgba(0, 0, 0, .42);
     --bg-drawer:    rgba(10, 8, 3, .9);
@@ -10,7 +10,7 @@
     --text-muted:   #888888;
     --text-dim:     #555555;
     --link:         #e8a020;
-    --border:       rgba(255, 255, 255, .07);
+    --border:       #fff8;
     --border-card:  rgba(0, 0, 0, .3);
     --shadow:       rgba(0, 0, 0, .5);
 }
@@ -244,7 +244,7 @@ dd h2 a { color: var(--text); text-decoration: none; }
 dd h2 a:hover { color: var(--link); }
 dd h2 .untitled { color: var(--text-dim); font-style: italic; }
 
-dd details { border-top: 1px solid var(--border); margin-top: .25em; }
+dd details { margin-top: .25em; }
 dd details summary {
     cursor: pointer;
     padding: .35em .75em;
@@ -288,7 +288,7 @@ dd ul > li + li {
 }
 dd li b { color: var(--text-muted); }
 dd li b::after { content: ': '; font-weight: normal; }
-dd form { margin-top: .75em; padding-top: .75em; border-top: 1px solid var(--border); }
+dd form { margin-top: .75em; padding-top: .75em;}
 dd form textarea { margin: .4em 0; }
 dd form button { width: 100%; }
 
@@ -297,7 +297,6 @@ dd footer {
     color: var(--text-dim);
     padding: .4em 0 .6em;
     text-align: right;
-    border-top: 1px solid var(--border);
     margin-top: .5em;
 }
 
