@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $feedHref = $routeUser ? APP_PATH . 'feed/' . $routeUser : APP_PATH . 'feed/';
-$pageTitle = 'Scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
+$pageTitle = 'scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,6 +72,9 @@ $pageTitle = 'Scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
     <meta charset="utf-8" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= ASSETS_PATH ?>style.css" />
     <link rel="icon" type="image/svg+xml" href="<?= ASSETS_PATH ?>img/logo.svg" />
     <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars($pageTitle) ?>" href="<?= htmlspecialchars($feedHref) ?>" />
