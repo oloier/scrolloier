@@ -273,14 +273,6 @@ dd details summary::after {
 dd details[open] summary::after { transform: rotate(90deg); }
 dd details summary:hover { color: var(--text); }
 
-dd details.no-comments summary {
-    background: var(--secondary);
-    border-radius: .2em;
-    color: var(--text);
-    display: block;
-    text-align: center;
-}
-dd details.no-comments summary::after { display: none; }
 
 dd summary var {
     font-style: normal;
