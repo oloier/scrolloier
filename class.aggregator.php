@@ -282,16 +282,16 @@ class aggregator
                 $id    = $m[1];
                 $embed = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $id . '?autoplay=1" frameborder="0" allowfullscreen></iframe>';
                 $thumb = 'https://img.youtube.com/vi/' . $id . '/hqdefault.jpg';
-                $thumbnail = '<img src="' . $thumb . '" alt="" data-embed="' . htmlspecialchars($embed, ENT_QUOTES) . '" loading="lazy" /><a>&#9654;</a>';
+                $thumbnail = '<img src="' . $thumb . '" alt="" data-embed="' . htmlspecialchars($embed, ENT_QUOTES) . '" loading="lazy" /><a></a>';
             } elseif (preg_match('/vimeo\.com\/(\d+)/', $url, $m)) {
                 $id    = $m[1];
                 $embed = '<iframe src="https://player.vimeo.com/video/' . $id . '?autoplay=1" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
                 $meta  = $this->getUrlMeta($url);
                 if (!empty($meta['thumbnail'])) {
                     $thumb = htmlspecialchars($meta['thumbnail'], ENT_QUOTES);
-                    $thumbnail = '<img src="' . $thumb . '" alt="" data-embed="' . htmlspecialchars($embed, ENT_QUOTES) . '" loading="lazy" /><a>&#9654;</a>';
+                    $thumbnail = '<img src="' . $thumb . '" alt="" data-embed="' . htmlspecialchars($embed, ENT_QUOTES) . '" loading="lazy" /><a></a>';
                 } else {
-                    $embedDirect = '<a href="' . $safe . '" class="regular">&#9654; Vimeo</a>';
+                    $embedDirect = '<a href="' . $safe . '" class="regular"> Vimeo</a>';
                 }
             } elseif (preg_match('/https?:\/\/(?:i\.)?imgur\.com\/([a-zA-Z0-9]+)\.gifv/i', $url, $m)) {
                 $mp4 = htmlspecialchars('https://i.imgur.com/' . $m[1] . '.mp4', ENT_QUOTES);
@@ -323,27 +323,23 @@ class aggregator
         $userHtml = $postUser ? " &middot; <span class=\"post-user\">$postUser</span>" : '';
 
         return "
-            <dl class=\"item\">
-                <dt>
-                    <article>
-                        $thumbnail $embedDirect $postImg
-                    </article>
-                </dt>
-                <dd>
-                    <h2><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h2>
-                    <details" . ($openComments ? ' open' : '') . ">
-                        <summary>" . ($commentsCount === 0 ? 'add comment' : "<var>$commentsCount</var> comments") . "</summary>
-                        <ul>$comments</ul>
-                        <form method=\"post\" action=\"" . APP_PATH . "\">
-                            <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" />
-                            <textarea name=\"comment\" placeholder=\"comment\" maxlength=\"1000\" required></textarea>
-                            <input type=\"hidden\" name=\"submittedComment\" value=\"$rowid\" />
-                            <button type=\"submit\">comment</button>
-                        </form>
-                    </details>
-                    <footer><time datetime=\"$postDateISO\">$postDate</time>$userHtml</footer>
-                </dd>
-            </dl>";
+            <article class=\"item\">
+                <figure>
+                    $thumbnail $embedDirect $postImg
+                </figure>
+                <h2><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h2>
+                <details" . ($openComments ? ' open' : '') . ">
+                    <summary>" . ($commentsCount === 0 ? 'add comment' : "<var>$commentsCount</var> comments") . "</summary>
+                    <ul>$comments</ul>
+                    <form method=\"post\" action=\"" . APP_PATH . "\">
+                        <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" />
+                        <textarea name=\"comment\" placeholder=\"comment\" maxlength=\"1000\" required></textarea>
+                        <input type=\"hidden\" name=\"submittedComment\" value=\"$rowid\" />
+                        <button type=\"submit\">comment</button>
+                    </form>
+                </details>
+                <footer><time datetime=\"$postDateISO\">$postDate</time>$userHtml</footer>
+            </article>";
     }
     private static function fetchUrl($url)
     {

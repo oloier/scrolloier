@@ -66,9 +66,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // dead image detection
-    document.querySelectorAll('article img').forEach(function (img) {
+    document.querySelectorAll('figure img').forEach(function (img) {
         img.addEventListener('error', function () {
-            var art = this.closest('article');
+            var art = this.closest('figure');
             if (art) art.classList.add('img-dead');
             var a = this.closest('a[href]');
             if (a) {
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (lightbox) {
         var lbImg = lightbox.querySelector('img');
         document.addEventListener('click', function (e) {
-            var a = e.target.closest('article a[rel="lightbox"]');
+            var a = e.target.closest('figure a[rel="lightbox"]');
             if (!a) return;
             e.preventDefault();
             lbImg.src = a.href;
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // embed play button
     document.addEventListener('click', function (e) {
-        var btn = e.target.closest('article img[data-embed] + a');
+        var btn = e.target.closest('figure img[data-embed] + a');
         if (!btn) return;
         e.preventDefault();
         var img = btn.previousElementSibling;
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ajax comment submit
     document.addEventListener('submit', function (e) {
-        var form = e.target.closest('dd form');
+        var form = e.target.closest('details form');
         if (!form) return;
         e.preventDefault();
 
@@ -129,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 ul.appendChild(li);
                 var counter = details.querySelector('summary var');
                 counter.textContent = parseInt(counter.textContent) + 1;
-                counter.classList.add('active');
                 form.reset();
             })
             .catch(function () {});
