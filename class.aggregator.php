@@ -257,7 +257,7 @@ class aggregator
         $postImg   = '';
         $thumbnail = '';
         $embedDirect = '';
-        $commentClass = '';
+
 
         $url  = $row['url'] ?? '';
         $safe = htmlspecialchars($url, ENT_QUOTES);
@@ -311,7 +311,7 @@ class aggregator
         $comments      = '';
         $commentsCount = count($postComments);
         if ($commentsCount > 0) {
-            $commentClass = 'class="active"';
+
             foreach ($postComments as $comment) {
                 $cName = htmlspecialchars($comment['name']);
                 $cText = $comment['comment'];
@@ -332,7 +332,7 @@ class aggregator
                 <dd>
                     <h2><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h2>
                     <details" . ($openComments ? ' open' : '') . ">
-                        <summary>" . ($commentsCount === 0 ? 'add comment' : "<var $commentClass>$commentsCount</var> comments") . "</summary>
+                        <summary>" . ($commentsCount === 0 ? 'add comment' : "<var>$commentsCount</var> comments") . "</summary>
                         <ul>$comments</ul>
                         <form method=\"post\" action=\"" . APP_PATH . "\">
                             <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" />

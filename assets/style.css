@@ -2,9 +2,7 @@
     --accent:       #e8a020;
     --secondary:    #555a;
     --bg:           radial-gradient(ellipse at 50% 0%, #26210e 0%, #111 65%);
-    --bg-card:      rgba(0, 0, 0, .42);
-    --bg-drawer:    rgba(10, 8, 3, .9);
-    --bg-input:     rgba(255, 255, 255, .12);
+    --bg-card:      rgba(0, 0, 0, .75);
     --bubble:       rgba(255, 255, 255, .1);
     --text:         #dddddd;
     --text-muted:   #888888;
@@ -18,16 +16,15 @@
 @media (prefers-color-scheme: light) {
     :root {
         --accent:       #b86e0a;
+        --secondary:    #0002;
         --bg:           radial-gradient(ellipse at 50% 0%, #f0ebe0 0%, #ddd7c7 65%);
-        --bg-card:      rgba(255, 255, 255, .62);
-        --bg-drawer:    rgba(248, 244, 235, .97);
-        --bg-input:     rgba(0, 0, 0, .07);
+        --bg-card:      rgba(255, 255, 255, .75);
         --bubble:       rgba(0, 0, 0, .08);
         --text:         #1e1e1e;
         --text-muted:   #666666;
         --text-dim:     #aaaaaa;
         --link:         #b86e0a;
-        --border:       rgba(0, 0, 0, .08);
+        --border:       #0003;
         --border-card:  rgba(0, 0, 0, .1);
         --shadow:       rgba(0, 0, 0, .15);
     }
@@ -83,8 +80,8 @@ a { color: var(--link); }
     overflow: hidden;
     max-height: 0;
     padding: 0 1em;
-    background: var(--bg-drawer);
-    backdrop-filter: blur(10px);
+    background: var(--bg-card);
+    backdrop-filter: blur(5px);
     border-left: 1px solid var(--border);
     border-radius: 0 0 0 .5em;
     transition: max-height .25s ease, padding .2s ease;
@@ -119,7 +116,7 @@ form input, form textarea {
     width: 100%;
     padding: .5em .25em;
     color: var(--text);
-    background: var(--bg-input);
+    background: var(--bg-card);
     border: 1px solid rgba(0,0,0,.5);
     border-radius: .3em;
 }
@@ -164,7 +161,7 @@ dl {
     border: 1px solid var(--border-card);
     border-radius: .5em;
     background: var(--bg-card);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     overflow: hidden;
 }
 
@@ -272,13 +269,12 @@ dd details summary:hover { color: var(--text); }
 
 dd summary var {
     font-style: normal;
-    color: var(--text);
     display: inline-block;
     padding: .1em .45em;
     border-radius: .2em;
-    background: var(--bubble);
+    background: var(--accent);
+    color: #000;
 }
-dd summary var.active { background: var(--accent); color: #000; }
 
 dd ul { margin:1em 0 0 1em; padding: 0; list-style: none; }
 dd ul > li {
