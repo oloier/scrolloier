@@ -248,6 +248,7 @@ dd ul li { font-size: 0.875rem; }
 dd li b { color: #999; }
 dd li b::after { content: ': '; font-weight: normal; }
 dd form { margin-top: .75em; padding-top: .75em; border-top: 1px solid rgba(255,255,255,.07); }
+dd form button { width: 100%; }
 dd form textarea { margin: .4em 0; }
 
 dd footer {
