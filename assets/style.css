@@ -3,6 +3,7 @@
     --secondary:    #555a;
     --bg:           radial-gradient(ellipse at 50% 0%, #26210e 0%, #111 65%);
     --bg-card:      rgba(0, 0, 0, .75);
+    --light:       rgba(255, 255, 255, .4);
     --bubble:       rgba(255, 255, 255, .1);
     --text:         #dddddd;
     --text-muted:   #888888;
@@ -59,11 +60,11 @@ a { color: var(--link); }
 #drawer-wrap {
     position: fixed;
     top: 0;
-    right: 3%;
+    left: 3%;
     z-index: 101;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
 }
 #toggle-new {
     display: inline-flex;
@@ -71,6 +72,11 @@ a { color: var(--link); }
     border-radius: 0 0 .5em .5em;
     padding: .55em 1.6em;
     box-shadow: 0 2px 6px var(--shadow);
+}
+#new-post.open ~ #toggle-new {
+    background: var(--secondary);
+    color: var(--text);
+    box-shadow: none;
 }
 #new-post {
     width: 300px;
@@ -82,8 +88,8 @@ a { color: var(--link); }
     padding: 0 1em;
     background: var(--bg-card);
     backdrop-filter: blur(5px);
-    border-left: 1px solid var(--border);
-    border-radius: 0 0 0 .5em;
+    border-right: 1px solid var(--border);
+    border-radius: 0 0 .5em 0;
     transition: max-height .25s ease, padding .2s ease;
 }
 #new-post.open {
@@ -117,7 +123,7 @@ form input, form textarea {
     padding: .5em .25em;
     color: var(--text);
     background: var(--bg-card);
-    border: 1px solid rgba(0,0,0,.5);
+    border: 1px solid var(--light);
     border-radius: .3em;
 }
 form textarea { height: 5em; margin: .5em 0; }
@@ -183,8 +189,8 @@ article.item {
 }
 
 /* article media */
-figure { margin: 0; }
 figure {
+    margin: 0;
     text-align: center;
     position: relative;
     aspect-ratio: 4/3;
@@ -355,8 +361,8 @@ article.item footer {
     #pagination { width: 100%; }
     #pagination a { padding: 1.25em 1.5em; }
     #drawer-wrap {
-        right: 0;
         left: 0;
+        right: 0;
         align-items: stretch;
     }
     #toggle-new {
@@ -367,7 +373,7 @@ article.item footer {
     #new-post {
         width: 100%;
         border-radius: 0;
-        border-left: 0;
+        border-right: 0;
         gap: .5em;
     }
     #new-post button[type="submit"] {
