@@ -83,7 +83,7 @@ class aggregator
     {
         $postid  = (int) $postData['submittedComment'];
         $name    = htmlspecialchars($postData['name'] ?? '');
-        $comment = parseMarkdown($postData['comment'] ?? '');
+        $comment = self::parseMarkdown($postData['comment'] ?? '');
         $stmt = $this->dbc->prepare("INSERT INTO comments (post, name, comment) VALUES (?, ?, ?)");
         $stmt->execute([$postid, $name, $comment]);
         $this->dbc->prepare("UPDATE posts SET bumped=datetime('now','localtime') WHERE id=?")->execute([$postid]);
@@ -129,7 +129,7 @@ class aggregator
                 $stmt->execute([$title, $mime, $data, '', $user]);
             } else {
                 if (preg_match('/https?:\/\/(?:i\.)?imgur\.com\/([a-zA-Z0-9]+)\.gifv/i', $url, $m)) {
-                    $data = fetchUrl('https://i.imgur.com/' . $m[1] . '.mp4');
+                    $data = self::fetchUrl('https://i.imgur.com/' . $m[1] . '.mp4');
                     if ($data) {
                         $stmt = $this->dbc->prepare("INSERT INTO posts (title, mime, image, url, user) VALUES (?, ?, ?, ?, ?)");
                         $stmt->execute([$title, 'video/mp4', $data, '', $user]);
@@ -141,9 +141,9 @@ class aggregator
                     $ext  = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
                     $mime = $mimeMap[$ext] ?? null;
                     if ($mime) {
-                        $data = fetchUrl($url);
+                        $data = self::fetchUrl($url);
                     } else {
-                        [$data, $mime] = fetchUrlWithMime($url);
+                        [$data, $mime] = self::fetchUrlWithMime($url);
                         $allowedMimes = array_values($mimeMap);
                         if (!in_array($mime, $allowedMimes, true)) {
                             $data = null;
@@ -345,6 +345,53 @@ class aggregator
                 </dd>
             </dl>";
     }
+    private static function fetchUrl($url)
+    {
+        $curl = curl_init($url);
+        if (!$curl) return false;
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0',
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+        $data = curl_exec($curl);
+        $err  = curl_errno($curl);
+        curl_close($curl);
+        return $err ? false : $data;
+    }
+
+    private static function fetchUrlWithMime($url)
+    {
+        $curl = curl_init($url);
+        if (!$curl) return [null, null];
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0',
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+        $data = curl_exec($curl);
+        $err  = curl_errno($curl);
+        $mime = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
+        curl_close($curl);
+        if ($err || !$data) return [null, null];
+        $mime = strtolower(preg_replace('/;.*$/', '', $mime ?? ''));
+        return [$data, $mime ?: null];
+    }
+
+    private static function parseMarkdown($text)
+    {
+        $text = htmlspecialchars($text, ENT_QUOTES);
+        $text = preg_replace('/\*(.+?)\*/s', '<strong>$1</strong>', $text);
+        $text = preg_replace('/_(.+?)_/s', '<em>$1</em>', $text);
+        $text = preg_replace('/^- (.+)/m', '<li>$1</li>', $text);
+        $text = preg_replace('/((?:<li>[^\n]*\n?)+)/', '<ul>$1</ul>', $text);
+        return nl2br($text);
+    }
+
     private function getUrlMeta($url)
     {
         $stmt = $this->dbc->prepare("SELECT thumbnail, title, fetched FROM url_cache WHERE url = ?");
@@ -358,13 +405,13 @@ class aggregator
         $title     = null;
 
         if (strpos($url, 'soundcloud.com') !== false) {
-            $json = fetchUrl('https://soundcloud.com/oembed?format=json&url=' . urlencode($url));
+            $json = self::fetchUrl('https://soundcloud.com/oembed?format=json&url=' . urlencode($url));
             if ($json && ($data = json_decode($json, true))) {
                 $thumbnail = $data['thumbnail_url'] ?? null;
                 $title     = $data['title'] ?? null;
             }
         } else {
-            $html = fetchUrl($url);
+            $html = self::fetchUrl($url);
             if ($html) {
                 foreach ([
                     '/<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']/i',
@@ -387,50 +434,4 @@ class aggregator
     }
 }
 
-function fetchUrl($url)
-{
-    $curl = curl_init($url);
-    if (!$curl) return false;
-    curl_setopt_array($curl, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT        => 10,
-        CURLOPT_USERAGENT      => 'Mozilla/5.0',
-        CURLOPT_SSL_VERIFYPEER => true,
-    ]);
-    $data = curl_exec($curl);
-    $err  = curl_errno($curl);
-    curl_close($curl);
-    return $err ? false : $data;
-}
-
-function fetchUrlWithMime($url)
-{
-    $curl = curl_init($url);
-    if (!$curl) return [null, null];
-    curl_setopt_array($curl, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT        => 10,
-        CURLOPT_USERAGENT      => 'Mozilla/5.0',
-        CURLOPT_SSL_VERIFYPEER => true,
-    ]);
-    $data = curl_exec($curl);
-    $err  = curl_errno($curl);
-    $mime = curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
-    curl_close($curl);
-    if ($err || !$data) return [null, null];
-    $mime = strtolower(preg_replace('/;.*$/', '', $mime ?? ''));
-    return [$data, $mime ?: null];
-}
-
-function parseMarkdown($text)
-{
-    $text = htmlspecialchars($text, ENT_QUOTES);
-    $text = preg_replace('/\*(.+?)\*/s', '<strong>$1</strong>', $text);
-    $text = preg_replace('/_(.+?)_/s', '<em>$1</em>', $text);
-    $text = preg_replace('/^- (.+)/m', '<li>$1</li>', $text);
-    $text = preg_replace('/((?:<li>[^\n]*\n?)+)/', '<ul>$1</ul>', $text);
-    return nl2br($text);
-}
 
