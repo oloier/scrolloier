@@ -54,7 +54,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>    <item>
         <title><?= htmlspecialchars($row['title'] ?? 'untitled') ?></title>
         <link><?= htmlspecialchars($link) ?></link>
-        <guid isPermaLink="false"><?= htmlspecialchars($link . ($row['bumped'] ? '#' . strtotime($row['bumped']) : '')) ?></guid>
+        <guid><?= htmlspecialchars($link . ($row['bumped'] ? '?bump=' . strtotime($row['bumped']) : '')) ?></guid>
         <pubDate><?= $pubDate ?></pubDate>
         <description><![CDATA[<?= $desc ?>]]></description>
     </item>
