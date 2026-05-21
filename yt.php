@@ -37,7 +37,7 @@ $channelTitle = (string) $atom->title;
 header('Content-Type: application/rss+xml; charset=utf-8');
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>
-<rss version="2.0">
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
 <channel>
 <title><?= htmlspecialchars($channelTitle) ?></title>
 <link>https://www.youtube.com/channel/<?= htmlspecialchars($channelId) ?></link>
@@ -55,7 +55,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 <link>https://www.youtube.com/watch?v=<?= htmlspecialchars($videoId) ?></link>
 <guid isPermaLink="true">https://www.youtube.com/watch?v=<?= htmlspecialchars($videoId) ?></guid>
 <pubDate><?= $pubDate ?></pubDate>
-<description><![CDATA[<?= $embed ?><?= $desc ? '<p>' . nl2br($desc) . '</p>' : '' ?>]]></description>
+<description><![CDATA[<?= $desc ? '<p>' . nl2br($desc) . '</p>' : '' ?>]]></description>
+<content:encoded><![CDATA[<?= $embed ?><?= $desc ? '<p>' . nl2br($desc) . '</p>' : '' ?>]]></content:encoded>
 </item>
 <?php endforeach ?>
 </channel>
