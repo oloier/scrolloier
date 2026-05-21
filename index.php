@@ -40,6 +40,7 @@ if (isset($_GET['delete']) && ($_GET['token'] ?? '') === DELETE_TOKEN) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Access-Control-Allow-Origin: *');
     if (!empty($_POST['submittedComment'])) {
         $saved = $agg->saveComment($_POST);
         if (!empty($_POST['_ajax'])) {
