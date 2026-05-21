@@ -254,15 +254,15 @@ dd details summary {
     cursor: pointer;
     padding: .35em .75em;
     list-style: none;
-    display: flex;
-    align-items: center;
+    display: block;
+    text-align: center;
     gap: .4em;
     user-select: none;
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-    background: var(--bubble);
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--secondary);
     border-radius: .3em;
-    margin: .4em 0;
+    
 }
 dd details summary::-webkit-details-marker { display: none; }
 dd details summary::after {
