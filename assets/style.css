@@ -244,7 +244,8 @@ dd ul > li + li {
     padding-top: .6em;
     border-top: 1px solid rgba(255,255,255,.07);
 }
-dd li b { color: #999; font-size: 0.75rem; }
+dd ul li { font-size: 0.875rem; }
+dd li b { color: #999; }
 dd li b::after { content: ': '; font-weight: normal; }
 dd form { margin-top: .75em; padding-top: .75em; border-top: 1px solid rgba(255,255,255,.07); }
 dd form textarea { margin: .4em 0; }
@@ -255,7 +256,8 @@ dd footer {
     border-top: 1px solid rgba(255,255,255,.05);
     margin-top: .5em;
 }
-dd footer time { font-size: 0.75rem; color: #555; }
+dd footer { font-size: 0.75rem; }
+dd footer time { color: #555; }
 
 /* pagination */
 #pagination {
