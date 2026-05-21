@@ -273,21 +273,20 @@ dd details[open] summary::after { transform: rotate(90deg); }
 dd details summary:hover { color: var(--text); }
 
 dd details.no-comments summary {
-    display: inline-flex;
-    width: auto;
-    padding: .25em .75em;
-    margin: .25em 0;
-    background: var(--bubble);
-    border-radius: .3em;
-    color: var(--text-muted);
-}
-dd details.no-comments summary::after { display: none; }
-
-dd summary var {
     background: var(--accent);
     border-radius: .2em;
     color: var(--text);
     display: block;
+}
+dd details.no-comments summary::after { display: none; }
+
+dd summary var {
+    font-style: normal;
+    color: var(--text);
+    display: inline-block;
+    padding: .1em .45em;
+    border-radius: .2em;
+    background: var(--bubble);
 }
 dd summary var.active { background: var(--accent); color: #000; }
 
