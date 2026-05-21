@@ -194,7 +194,7 @@ class aggregator
     public function getAllPosts()
     {
         $where = $this->user ? 'WHERE user=?' : '';
-        $sql   = "SELECT id, title, file, url, mime, user, (image IS NOT NULL) as has_image,
+        $sql   = "SELECT id, title, file, url, mime, user, bumped, (image IS NOT NULL) as has_image,
                          COALESCE(bumped, date) as date
                   FROM posts $where
                   ORDER BY COALESCE(bumped, date) DESC";
