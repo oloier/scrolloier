@@ -1,6 +1,7 @@
 /* ── Variables ────────────────────────────────────────── */
 :root {
     --accent:       #e8a020;
+    --secondary:   #555a;
     --bg:           radial-gradient(ellipse at 50% 0%, #26210e 0%, #111 65%);
     --bg-card:      rgba(0, 0, 0, .42);
     --bg-drawer:    rgba(10, 8, 3, .9);
@@ -273,10 +274,11 @@ dd details[open] summary::after { transform: rotate(90deg); }
 dd details summary:hover { color: var(--text); }
 
 dd details.no-comments summary {
-    background: var(--accent);
+    background: var(--secondary);
     border-radius: .2em;
     color: var(--text);
     display: block;
+    text-align: center;
 }
 dd details.no-comments summary::after { display: none; }
 

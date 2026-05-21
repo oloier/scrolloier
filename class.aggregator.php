@@ -332,7 +332,7 @@ class aggregator
                 <dd>
                     <h3><a href=\"" . APP_PATH . "post/$rowid\">$titleHtml</a></h3>
                     <details" . ($openComments ? ' open' : '') . ($commentsCount === 0 ? ' class="no-comments"' : '') . ">
-                        <summary>" . ($commentsCount === 0 ? '<span class="comment-btn">comment</span>' : "<var $commentClass>$commentsCount</var> comments") . "</summary>
+                        <summary>" . ($commentsCount === 0 ? '<span class="comment-btn">add comment</span>' : "<var $commentClass>$commentsCount</var> comments") . "</summary>
                         <ul>$comments</ul>
                         <form method=\"post\" action=\"" . APP_PATH . "\">
                             <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" />
@@ -433,5 +433,3 @@ class aggregator
         return ['thumbnail' => $thumbnail, 'title' => $title];
     }
 }
-
-
