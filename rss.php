@@ -49,7 +49,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     }
 
     foreach ($agg->getPostComments($id) as $c) {
-        $desc .= '<blockquote><b>' . htmlspecialchars($c['name']) . '</b><p>' . $c['comment'] . '</p></blockquote>';
+        $cName = $c['name'] ? '<b>' . htmlspecialchars($c['name']) . '</b>: ' : '';
+        $desc .= '<p>' . $cName . $c['comment'] . '</p>';
     }
 ?>    <item>
         <title><?= htmlspecialchars($row['title'] ?? 'untitled') ?></title>
