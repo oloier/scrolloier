@@ -46,7 +46,7 @@ h3, h4 {
 }
 button, input, select, textarea { color: inherit; font: inherit; margin: 0; }
 button { cursor: pointer; }
-textarea { overflow: auto; }
+textarea { overflow: auto; resize: vertical; font-size: 0.875rem; }
 dl, dt, dd, ul { margin: 0; padding: 0; }
 
 /* ── Base ─────────────────────────────────────────────── */
@@ -264,13 +264,25 @@ dd details summary::-webkit-details-marker { display: none; }
 dd details summary::after {
     content: '›';
     margin-left: auto;
-    font-size: 1.1em;
+    font-size: 1.4em;
     line-height: 1;
     display: inline-block;
     transition: transform .18s ease;
 }
 dd details[open] summary::after { transform: rotate(90deg); }
 dd details summary:hover { color: var(--text); }
+
+dd details.no-comments summary {
+    display: inline-flex;
+    width: auto;
+    padding: .25em .75em;
+    margin: .25em 0;
+    background: var(--bubble);
+    border-radius: .3em;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+dd details.no-comments summary::after { display: none; }
 
 dd summary var {
     font-style: normal;
