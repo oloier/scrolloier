@@ -315,7 +315,7 @@ class aggregator
             foreach ($postComments as $comment) {
                 $cName = htmlspecialchars($comment['name']);
                 $cText = $comment['comment'];
-                $comments .= "<li><b>$cName</b><p>$cText</p></li>";
+                $comments .= "<li><b>$cName</b>$cText</li>";
             }
         }
 
