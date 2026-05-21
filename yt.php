@@ -1,5 +1,18 @@
 <?php
 
+// watch page: ?v=VIDEO_ID
+$videoId = preg_replace('/[^A-Za-z0-9_-]/', '', $_GET['v'] ?? '');
+if ($videoId) {
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
+    echo '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;width:100vw;height:100vh}iframe{width:100%;height:100%;border:0}</style>';
+    echo '</head><body>';
+    echo '<iframe src="https://www.youtube.com/embed/' . $videoId . '?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    echo '</body></html>';
+    exit;
+}
+
+// feed: ?channel=CHANNEL_ID
 $channelId = preg_replace('/[^A-Za-z0-9_-]/', '', $_GET['channel'] ?? '');
 if (!$channelId) {
     http_response_code(400);
@@ -36,6 +49,8 @@ $NS_YT    = 'http://www.youtube.com/xml/schemas/2015';
 $NS_MEDIA = 'http://search.yahoo.com/mrss/';
 
 $channelTitle = (string) $atom->title;
+$base         = 'https://oloier.com/share/yt.php';
+
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
@@ -44,17 +59,18 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 <link>https://www.youtube.com/channel/<?= htmlspecialchars($channelId) ?></link>
 <description><?= htmlspecialchars($channelTitle) ?></description>
 <?php foreach ($atom->entry as $entry):
-    $videoId = (string) $entry->children($NS_YT)->videoId;
+    $vid     = (string) $entry->children($NS_YT)->videoId;
     $title   = (string) $entry->title;
     $pubDate = date('r', strtotime((string) $entry->published));
     $media   = $entry->children($NS_MEDIA)->group;
     $desc    = $media ? htmlspecialchars((string) $media->description) : '';
-    $embed   = '<iframe width="560" height="285" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen="allowfullscreen"></iframe>';
+    $watch   = $base . '?v=' . $vid;
+    $embed   = '<iframe width="560" height="285" src="https://www.youtube.com/embed/' . $vid . '" frameborder="0" allowfullscreen="allowfullscreen"></iframe>';
 ?>
 <item>
 <title><?= htmlspecialchars($title) ?></title>
-<link>https://www.youtube.com/watch?v=<?= htmlspecialchars($videoId) ?></link>
-<guid isPermaLink="true">https://www.youtube.com/watch?v=<?= htmlspecialchars($videoId) ?></guid>
+<link><?= $watch ?></link>
+<guid isPermaLink="false">https://www.youtube.com/watch?v=<?= htmlspecialchars($vid) ?></guid>
 <pubDate><?= $pubDate ?></pubDate>
 <description><![CDATA[<?= $desc ? '<p>' . nl2br($desc) . '</p>' : '' ?>]]></description>
 <content:encoded><![CDATA[<?= $embed ?><?= $desc ? '<p>' . nl2br($desc) . '</p>' : '' ?>]]></content:encoded>
