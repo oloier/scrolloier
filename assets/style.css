@@ -41,7 +41,6 @@ h2 {
     margin: 0 0 .7em;
     text-align: left;
     font-family: 'Oswald', sans-serif;
-    font-size: 1.5rem;
     font-weight: 400;
 }
 button, input, select, textarea { color: inherit; font: inherit; margin: 0; }
@@ -74,7 +73,6 @@ a { color: var(--link); }
     align-items: center;
     border-radius: 0 0 .5em .5em;
     padding: .55em 1.6em;
-    font-size: 0.875rem;
     box-shadow: 0 2px 6px var(--shadow);
 }
 #new-post {
@@ -99,7 +97,7 @@ a { color: var(--link); }
 #new-post input[type="text"],
 #new-post input[type="url"],
 #new-post input[type="file"] { display: block; width: 100%; }
-#file-label { font-size: 0.875rem; color: var(--text-muted); cursor: pointer; }
+#file-label { color: var(--text-muted); cursor: pointer; }
 #file-label span { display: block; margin-bottom: .25em; }
 
 /* buttons */
@@ -109,7 +107,7 @@ button, .button {
     border-radius: .3em;
     color: #000;
     display: inline-block;
-    font: bold 0.875rem sans-serif;
+    font-weight: bold;
     padding: .75em 1.5em;
     text-decoration: none;
 }
@@ -120,7 +118,6 @@ form input, form textarea {
     display: block;
     width: 100%;
     padding: .5em .25em;
-    font-size: 0.875rem;
     color: var(--text);
     background: var(--bg-input);
     border: 1px solid rgba(0,0,0,.5);
@@ -210,7 +207,6 @@ article.img-dead::after {
     left: 50%;
     transform: translate(-50%, -50%);
     color: var(--text-dim);
-    font-size: .8em;
     white-space: nowrap;
 }
 article iframe, article video { aspect-ratio: 16/9; height: auto; }
@@ -257,7 +253,6 @@ dd details summary {
     align-items: center;
     gap: .4em;
     user-select: none;
-    font-size: 0.9rem;
     color: var(--text);
     background: var(--secondary);
     border-radius: .3em;
@@ -286,7 +281,6 @@ dd summary var {
 dd summary var.active { background: var(--accent); color: #000; }
 
 dd ul { margin: .5em 0 1em; padding: 0; list-style: none; }
-dd ul li { font-size: 0.875rem; }
 dd ul > li + li {
     margin-top: .6em;
     padding-top: .6em;
@@ -341,7 +335,6 @@ dd footer {
 #back-link {
     display: inline-block;
     margin: .75em 3% 0;
-    font-size: 0.875rem;
     color: var(--text-muted);
     text-decoration: none;
 }
@@ -370,7 +363,6 @@ dd footer {
         border-radius: 0;
         justify-content: center;
         padding: .75em 1em;
-        font-size: 1rem;
     }
     #new-post {
         width: 100%;
@@ -381,7 +373,6 @@ dd footer {
     #new-post button[type="submit"] {
         width: 100%;
         padding: 1em;
-        font-size: 1rem;
     }
 }
 
@@ -398,7 +389,6 @@ dd footer {
 .loader {
     display: inline-block;
     margin: 6em auto;
-    font-size: 10px;
     position: relative;
     text-indent: -9999em;
     border: 1.1em solid var(--bubble);
