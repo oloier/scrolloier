@@ -30,7 +30,7 @@ a { color: orange; }
     display: inline-flex;
     align-items: center;
     border-radius: 0 0 .5em .5em;
-    padding: .4em 1em;
+    padding: .55em 1.6em;
     font-size: 0.875rem;
     box-shadow: 0 2px 6px rgba(0,0,0,.5);
 }

@@ -315,7 +315,7 @@ class aggregator
             foreach ($postComments as $comment) {
                 $cName = htmlspecialchars($comment['name']);
                 $cText = $comment['comment'];
-                $comments .= "<li><b>$cName</b>$cText</li>";
+                $comments .= "<li>" . ($cName !== '' ? "<b>$cName</b>" : '') . "$cText</li>";
             }
         }
 
@@ -335,7 +335,7 @@ class aggregator
                         <summary><var $commentClass>$commentsCount</var> comments</summary>
                         <ul>$comments</ul>
                         <form method=\"post\" action=\"" . APP_PATH . "\">
-                            <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" required />
+                            <input type=\"text\" name=\"name\" placeholder=\"name\" maxlength=\"100\" />
                             <textarea name=\"comment\" placeholder=\"comment\" maxlength=\"1000\" required></textarea>
                             <input type=\"hidden\" name=\"submittedComment\" value=\"$rowid\" />
                             <button type=\"submit\">comment</button>
