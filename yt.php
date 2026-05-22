@@ -64,8 +64,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $pubDate = date('r', strtotime((string) $entry->published));
     $media   = $entry->children($NS_MEDIA)->group;
     $desc    = $media ? htmlspecialchars((string) $media->description) : '';
-    $watch   = 'https://www.youtube.com/watch?v=' . $vid;
-    $embed   = '<base href="https://oloier.com/"><iframe width="560" height="285" src="https://www.youtube.com/embed/' . $vid . '" frameborder="0" allowfullscreen="allowfullscreen"></iframe>';
+    $watch   = 'https://oloier.com/share/yt.php?v=' . $vid;
+    $embed   = '<iframe width="560" height="285" src="https://www.youtube.com/embed/' . $vid . '" frameborder="0" allowfullscreen="allowfullscreen"></iframe>';
 ?>
 <item>
 <title><?= htmlspecialchars($title) ?></title>
