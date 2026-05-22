@@ -19,7 +19,7 @@ if (!in_array($mime, $allowed, true) || $file['size'] > 4 * 1024 * 1024) {
 
 $db   = new db('share.db');
 $data = file_get_contents($file['tmp_name']);
-$stmt = $db->db->prepare("INSERT INTO posts (title, mime, image, url, user) VALUES ('', ?, ?, '', NULL)");
+$stmt = $db->db->prepare("INSERT INTO posts (title, mime, image, url, user) VALUES ('', ?, ?, '', '_attachment')");
 $stmt->execute([$mime, $data]);
 
 echo json_encode(['ok' => true, 'id' => (int) $db->db->lastInsertId()]);
