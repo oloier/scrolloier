@@ -278,7 +278,7 @@ class aggregator
                 $postImg = '<a class="loader" href="' . $safe . '" rel="lightbox"><img src="' . $safe . '" alt="" loading="lazy" /></a>';
             } elseif (preg_match('/https?:\/\/\S+\.(?:mp4|webm|ogg)(\?[^\s]*)?$/i', $url)) {
                 $embedDirect = '<video autoplay controls loop muted playsinline><source src="' . $safe . '"></video>';
-            } elseif (preg_match('/(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/', $url, $m)) {
+            } elseif (preg_match('/(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/embed\/|yt\.php\?v=)([a-zA-Z0-9_-]{11})/', $url, $m)) {
                 $id    = $m[1];
                 $embed = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $id . '?autoplay=1" frameborder="0" allowfullscreen></iframe>';
                 $thumb = 'https://img.youtube.com/vi/' . $id . '/hqdefault.jpg';
