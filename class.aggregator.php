@@ -325,9 +325,11 @@ class aggregator
         $postUser = htmlspecialchars($row['user'] ?? '');
         $userHtml = $postUser ? " &middot; <span class=\"post-user\">$postUser</span>" : '';
 
+        $figureData = ($hasLocalMedia && !empty($url)) ? ' data-url="' . $safe . '"' : '';
+
         return "
             <article class=\"item\">
-                <figure>
+                <figure$figureData>
                     $thumbnail $embedDirect $postImg
                 </figure>
                 <div>
