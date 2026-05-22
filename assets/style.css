@@ -270,7 +270,7 @@ article.item details summary {
 }
 article.item details summary::-webkit-details-marker { display: none; }
 article.item details summary::after {
-    content: '›';
+    content: '\203A';
     margin-left: auto;
     font-size: 2em;
     line-height: 1;
