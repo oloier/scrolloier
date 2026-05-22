@@ -5,7 +5,7 @@ require_once("class.db.php");
 define('APP_PATH',    '/share/');
 define('ASSETS_PATH', APP_PATH . 'assets/');
 define('FILES_LIMIT',   4000000);
-define('FILES_ALLOWED', serialize(['jpg', 'png', 'gif', 'svg', 'jpeg', 'mp3', 'm4a', 'wav']));
+define('FILES_ALLOWED', serialize(['jpg', 'png', 'gif', 'svg', 'jpeg', 'webp', 'mp3', 'm4a', 'wav']));
 define('POST_LIMIT', 500);
 define('DELETE_TOKEN', 'scroll-del-7f3a9c');
 define('USERS', ['scott', 'mike']);
@@ -82,12 +82,12 @@ class aggregator
     public function saveComment($postData)
     {
         $postid  = (int) $postData['submittedComment'];
-        $name    = htmlspecialchars($postData['name'] ?? '');
+        $name    = trim($postData['name'] ?? '');
         $comment = self::parseMarkdown($postData['comment'] ?? '');
         $stmt = $this->dbc->prepare("INSERT INTO comments (post, name, comment) VALUES (?, ?, ?)");
         $stmt->execute([$postid, $name, $comment]);
         $this->dbc->prepare("UPDATE posts SET bumped=datetime('now','localtime') WHERE id=?")->execute([$postid]);
-        return ['name' => $name, 'comment' => $comment];
+        return ['name' => htmlspecialchars($name), 'comment' => $comment];
     }
 
     public function savePost($postData, $filesArray = [])
