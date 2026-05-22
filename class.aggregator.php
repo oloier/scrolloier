@@ -5,7 +5,7 @@ require_once("class.db.php");
 define('APP_PATH',    '/share/');
 define('ASSETS_PATH', APP_PATH . 'assets/');
 define('FILES_LIMIT',   4000000);
-define('FILES_ALLOWED', serialize(['jpg', 'png', 'gif', 'svg', 'jpeg']));
+define('FILES_ALLOWED', serialize(['jpg', 'png', 'gif', 'svg', 'jpeg', 'mp3', 'm4a', 'wav']));
 define('POST_LIMIT', 500);
 define('DELETE_TOKEN', 'scroll-del-7f3a9c');
 define('USERS', ['scott', 'mike']);
@@ -121,7 +121,8 @@ class aggregator
         if ($gameOn) {
             $user    = isset($postData['user']) && in_array($postData['user'], USERS) ? $postData['user'] : null;
             $mimeMap = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png',
-                        'gif' => 'image/gif', 'svg' => 'image/svg+xml', 'webp' => 'image/webp'];
+                        'gif' => 'image/gif', 'svg' => 'image/svg+xml', 'webp' => 'image/webp',
+                        'mp3' => 'audio/mpeg', 'm4a' => 'audio/mp4', 'wav' => 'audio/wav'];
             if ($haveUpload) {
                 $mime = $mimeMap[$fileExt] ?? 'application/octet-stream';
                 $data = file_get_contents($fileTmp);
@@ -268,6 +269,8 @@ class aggregator
             $mime = $row['mime'] ?? '';
             if (strpos($mime, 'video/') === 0) {
                 $embedDirect = '<video autoplay controls loop muted playsinline><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></video>';
+            } elseif (strpos($mime, 'audio/') === 0) {
+                $embedDirect = '<audio controls><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></audio>';
             } else {
                 $postImg = '<a href="' . $src . '" rel="lightbox">'
                          . '<img src="' . $src . '" alt="' . $postTitle . '" loading="lazy" />'

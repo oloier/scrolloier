@@ -38,6 +38,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $mime  = $row['mime'] ?? '';
         if (strpos($mime, 'video/') === 0) {
             $desc .= '<video controls><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></video>';
+        } elseif (strpos($mime, 'audio/') === 0) {
+            $desc .= '<audio controls><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></audio>';
         } else {
             $desc .= '<img src="' . $src . '" style="max-width:100%" />';
         }
