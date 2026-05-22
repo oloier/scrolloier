@@ -19,14 +19,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // new post drawer
     var newForm   = document.getElementById('new-post');
     var toggleBtn = document.getElementById('toggle-new');
+    var closedHtml = toggleBtn ? toggleBtn.innerHTML : '';
     function closeDrawer() {
         newForm.classList.remove('open');
-        toggleBtn.textContent = '+ new post';
+        toggleBtn.innerHTML = closedHtml;
     }
     if (newForm && toggleBtn) {
         toggleBtn.addEventListener('click', function () {
             var open = newForm.classList.toggle('open');
-            toggleBtn.textContent = open ? '× close' : '+ new post';
+            toggleBtn.innerHTML = open ? '× close' : closedHtml;
         });
         document.addEventListener('click', function (e) {
             if (newForm.classList.contains('open') && !newForm.contains(e.target) && !toggleBtn.contains(e.target)) {

@@ -104,7 +104,7 @@ $pageTitle = 'scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
         <button type="submit">post it</button>
         <a href="<?= APP_PATH ?>bookmarklets.html" class="drawer-tools-link">bookmarklets &amp; shortcuts</a>
     </form>
-    <button id="toggle-new">+ new post</button>
+    <button id="toggle-new"><img src="<?= ASSETS_PATH ?>logo.svg" alt="" style="height:1em;vertical-align:middle;margin-right:.4em;opacity:.8"> new post</button>
 </div>
 
 <?php
