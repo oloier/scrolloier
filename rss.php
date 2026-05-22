@@ -11,7 +11,7 @@ $base  = $proto . '://' . $_SERVER['HTTP_HOST'] . APP_PATH;
 $agg   = new aggregator(1, $rssUser);
 $rows  = $agg->getAllPosts();
 
-$feedTitle = 'Scrolloier' . ($rssUser ? ' / ' . $rssUser : '');
+$feedTitle = 'scrolloier' . ($rssUser ? ' / ' . $rssUser : '');
 
 $feedSelf = $base . ($rssUser ? 'feed/' . $rssUser : 'rss.php');
 
