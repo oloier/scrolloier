@@ -71,6 +71,26 @@ class aggregator
         if (!in_array('bumped', $cols)) {
             $this->dbc->exec("ALTER TABLE posts ADD COLUMN bumped REAL");
         }
+        $createSql = $this->dbc->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='posts'")->fetchColumn();
+        if ($createSql && stripos($createSql, 'AUTOINCREMENT') === false) {
+            $this->dbc->beginTransaction();
+            $this->dbc->exec("ALTER TABLE posts RENAME TO posts_old");
+            $this->dbc->exec("CREATE TABLE posts (
+                id     INTEGER PRIMARY KEY AUTOINCREMENT,
+                date   REAL    DEFAULT (datetime('now','localtime')),
+                title  TEXT    NOT NULL,
+                file   TEXT    NULL,
+                url    TEXT    NULL,
+                image  BLOB    NULL,
+                mime   TEXT    NULL,
+                user   TEXT    NULL,
+                bumped REAL    NULL
+            )");
+            $this->dbc->exec("INSERT INTO posts (id, date, title, file, url, image, mime, user, bumped)
+                              SELECT id, date, title, file, url, image, mime, user, bumped FROM posts_old");
+            $this->dbc->exec("DROP TABLE posts_old");
+            $this->dbc->commit();
+        }
     }
 
     public function deletePost($id)
