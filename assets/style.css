@@ -178,7 +178,7 @@ article.item {
     position: absolute;
     top: .4em;
     right: .4em;
-    background: var(--accent);
+    background: #fff;
     color: #000;
     font: bold 0.65rem/1 sans-serif;
     padding: .25em .5em;
