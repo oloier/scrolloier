@@ -386,6 +386,7 @@ class aggregator
     private static function parseMarkdown($text)
     {
         $text = htmlspecialchars($text, ENT_QUOTES);
+        $text = preg_replace('/!\[([^\]]*)\]\((\/share\/img\/\d+)\)/', '<a rel="lightbox" href="$2"><img src="$2" alt="$1" loading="lazy" style="max-height:5rem;width:auto;border-radius:4px;margin:.25em 0;cursor:zoom-in"></a>', $text);
         $text = preg_replace('/\*(.+?)\*/s', '<strong>$1</strong>', $text);
         $text = preg_replace('/_(.+?)_/s', '<em>$1</em>', $text);
         $text = preg_replace('/^- (.+)/m', '<li>$1</li>', $text);

@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (lightbox) {
         var lbImg = lightbox.querySelector('img');
         document.addEventListener('click', function (e) {
-            var a = e.target.closest('figure a[rel="lightbox"]');
+            var a = e.target.closest('a[rel="lightbox"]');
             if (!a) return;
             e.preventDefault();
             lbImg.src = a.href;
@@ -122,6 +122,60 @@ document.addEventListener('DOMContentLoaded', function () {
                 form.reset();
             })
             .catch(function () {});
+    });
+
+    // image paste into comment textareas
+    document.addEventListener('paste', function (e) {
+        var ta = e.target.closest('details form textarea[name="comment"]');
+        if (!ta) return;
+        var item = Array.from(e.clipboardData.items).find(function (i) { return i.type.startsWith('image/'); });
+        if (!item) return;
+        e.preventDefault();
+
+        var blob = item.getAsFile();
+        var fd   = new FormData();
+        fd.append('img', blob, 'paste.' + item.type.split('/')[1]);
+
+        var preview     = ta.parentElement.querySelector('.paste-previews');
+        if (!preview) {
+            preview = document.createElement('div');
+            preview.className = 'paste-previews';
+            preview.style.cssText = 'display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.4rem';
+            ta.parentElement.insertBefore(preview, ta);
+        }
+
+        var placeholder = document.createElement('span');
+        placeholder.textContent = '⏳';
+        preview.appendChild(placeholder);
+
+        fetch('/share/paste.php', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                placeholder.remove();
+                if (!res.ok) return;
+                var url = '/share/img/' + res.id;
+                var img = document.createElement('img');
+                img.src = url;
+                img.style.cssText = 'height:3rem;border-radius:4px;cursor:pointer';
+                img.title = 'click to remove';
+                img.addEventListener('click', function () {
+                    var ref = '![](' + url + ')';
+                    ta.value = ta.value.replace(ref, '');
+                    img.remove();
+                });
+                preview.appendChild(img);
+                var ref   = '![](' + url + ')';
+                var start = ta.selectionStart;
+                ta.value  = ta.value.slice(0, start) + ref + ta.value.slice(ta.selectionEnd);
+                ta.selectionStart = ta.selectionEnd = start + ref.length;
+            })
+            .catch(function () { placeholder.remove(); });
+    });
+
+    document.addEventListener('reset', function (e) {
+        if (!e.target.closest('details form')) return;
+        var p = e.target.querySelector('.paste-previews');
+        if (p) p.remove();
     });
 
     document.querySelectorAll('time[datetime]').forEach(function (el) {
