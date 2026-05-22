@@ -102,6 +102,7 @@ $pageTitle = 'scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
         <?php endif ?>
         <input type="hidden" name="submittedPost" value="1" />
         <button type="submit">post it</button>
+        <a href="<?= APP_PATH ?>bookmarklets.html" class="drawer-tools-link">bookmarklets &amp; shortcuts</a>
     </form>
     <button id="toggle-new">+ new post</button>
 </div>
