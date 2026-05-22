@@ -23,7 +23,10 @@ a.bookmarklet {
 <body>
 <h1>scrolloier bookmarklets</h1>
 
-<p>Drag to your bookmarks bar. Click while on any page to post it silently.</p>
+<p>Drag to your bookmarks bar. Click bookmarklet while on any page to create post here.</p>
+
+<p><strong>Note:</strong></p>
+<a class="bookmarklet" href="https://www.icloud.com/shortcuts/b4fc72671dfd4c6882bc68da0d2a9abc">+ scrolloier (iOS Shortcut)</a>
 
 <p><strong>scott</strong></p>
 <a class="bookmarklet" href="javascript:(function(){var d=new FormData();d.append('url',location.href);d.append('title',document.title);d.append('user','scott');d.append('submittedPost','1');d.append('_ajax','1');fetch('https://oloier.com/share/',{method:'POST',body:d}).then(function(r){return r.json();}).then(function(res){var t=document.createElement('div');t.textContent=res.ok?'posted ✓':'failed ✗';t.style.cssText='position:fixed;top:1em;right:1em;z-index:99999;background:'+(res.ok?'#e8a020':'#c0392b')+';color:#000;font:bold 14px/1 sans-serif;padding:.75em 1.25em;border-radius:.3em;box-shadow:0 2px 8px rgba(0,0,0,.3);';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}).catch(function(){alert('post failed');});}());">+ scrolloier (scott)</a>
