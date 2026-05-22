@@ -29,6 +29,10 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $url     = $row['url'] ?? '';
     $desc    = '';
 
+    if (preg_match('/yt\.php\?v=([A-Za-z0-9_-]{11})/', $url, $ytm)) {
+        $url = 'https://www.youtube.com/watch?v=' . $ytm[1];
+    }
+
     if (!empty($row['has_image'])) {
         $src   = $base . 'img.php?id=' . $id;
         $mime  = $row['mime'] ?? '';
@@ -53,7 +57,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $desc .= '<p>' . $cName . $c['comment'] . '</p>';
     }
 ?>    <item>
-        <title><?= htmlspecialchars($row['title'] ?? 'untitled') ?></title>
+        <title><?= htmlspecialchars($row['title'] ?: ($url ?: 'untitled')) ?></title>
         <link><?= htmlspecialchars($link) ?></link>
         <guid><?= htmlspecialchars($link . ($row['bumped'] ? '?bump=' . strtotime($row['bumped']) : '')) ?></guid>
         <pubDate><?= $pubDate ?></pubDate>
