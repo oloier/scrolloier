@@ -68,20 +68,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // dead image detection
     document.querySelectorAll('figure img').forEach(function (img) {
         img.addEventListener('error', function () {
-            var fig = this.closest('figure');
-            if (fig) fig.classList.add('img-dead');
-            var externalUrl = fig && fig.dataset.url;
-            var a = this.closest('a[href]');
-            var href = externalUrl || (a && a.href);
-            if (href) {
-                var link = document.createElement('a');
-                link.href = href;
-                link.className = 'regular';
-                link.textContent = href;
-                link.target = '_blank';
-                link.rel = 'noopener';
-                fig.appendChild(link);
-            }
+            var art = this.closest('figure');
+            if (art) art.classList.add('img-dead');
         });
     });
 
