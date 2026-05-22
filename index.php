@@ -11,6 +11,13 @@ $_segs     = array_values(array_filter(explode('/', ltrim($_path, '/'))));
 $routeUser   = null;
 $routePostId = null;
 
+// /img/123  → media
+if (($_segs[0] ?? '') === 'img' && !empty($_segs[1])) {
+    $_GET['id'] = (int) $_segs[1];
+    require 'img.php';
+    exit;
+}
+
 // /feed/username  → RSS
 if (($_segs[0] ?? '') === 'feed' && !empty($_segs[1]) && in_array($_segs[1], USERS)) {
     $routeUser = $_segs[1];

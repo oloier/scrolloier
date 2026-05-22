@@ -265,7 +265,7 @@ class aggregator
 
         $hasLocalMedia = !empty($row['file']) || !empty($row['has_image']);
         if ($hasLocalMedia) {
-            $src  = APP_PATH . 'img.php?id=' . $rowid;
+            $src  = APP_PATH . 'img/' . $rowid;
             $mime = $row['mime'] ?? '';
             if (strpos($mime, 'video/') === 0) {
                 $embedDirect = '<video autoplay controls loop muted playsinline><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></video>';

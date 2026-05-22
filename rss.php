@@ -34,7 +34,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     }
 
     if (!empty($row['has_image'])) {
-        $src   = $base . 'img.php?id=' . $id;
+        $src   = $base . 'img/' . $id;
         $mime  = $row['mime'] ?? '';
         if (strpos($mime, 'video/') === 0) {
             $desc .= '<video controls><source src="' . $src . '" type="' . htmlspecialchars($mime) . '"></video>';
