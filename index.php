@@ -83,8 +83,8 @@ $pageTitle = 'scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= ASSETS_PATH ?>style.css" />
-    <link rel="icon" type="image/svg+xml" href="<?= ASSETS_PATH ?>img/logo.svg" />
+    <link rel="stylesheet" href="<?= ASSETS_PATH ?>style.css?v=2" />
+    <link rel="icon" type="image/svg+xml" href="<?= ASSETS_PATH ?>logo.svg" />
     <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars($pageTitle) ?>" href="<?= htmlspecialchars($feedHref) ?>" />
 </head>
 <body>
@@ -124,7 +124,7 @@ $pageTitle = 'scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
     <img src="" alt="" />
 </dialog>
 
-<script src="<?= ASSETS_PATH ?>js/script.js"></script>
+<script src="<?= ASSETS_PATH ?>script.js?v=2"></script>
 
 </body>
 </html>
