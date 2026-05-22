@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$feedHref = $routeUser ? APP_PATH . 'feed/' . $routeUser : APP_PATH . 'feed/';
+$feedHref = $routeUser ? APP_PATH . 'feed/' . $routeUser : APP_PATH . 'rss.php';
 $pageTitle = 'scrolloier' . ($routeUser ? ' / ' . $routeUser : '');
 ?>
 <!DOCTYPE html>
