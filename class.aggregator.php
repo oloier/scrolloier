@@ -4,7 +4,7 @@ require_once("class.db.php");
 
 define('APP_PATH',    '/share/');
 define('ASSETS_PATH', APP_PATH . 'assets/');
-define('FILES_LIMIT',   4000000);
+define('FILES_LIMIT',   12000000);
 define('FILES_ALLOWED', serialize(['jpg', 'png', 'gif', 'svg', 'jpeg', 'webp', 'mp3', 'm4a', 'wav']));
 define('POST_LIMIT', 500);
 define('DELETE_TOKEN', 'scroll-del-7f3a9c');
