@@ -5,7 +5,7 @@ $videoId = preg_replace('/[^A-Za-z0-9_-]/', '', $_GET['v'] ?? '');
 if ($videoId) {
     header('Content-Type: text/html; charset=utf-8');
     echo '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
-    echo '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;width:100vw;height:100vh}iframe{width:100%;height:100%;border:0}</style>';
+    echo '<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;width:100vw;height:100vh;overflow:hidden}iframe{width:100%;height:100%;border:0}</style>';
     echo '</head><body>';
     echo '<iframe src="https://www.youtube.com/embed/' . $videoId . '?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
     echo '</body></html>';
