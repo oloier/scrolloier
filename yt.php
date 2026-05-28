@@ -50,6 +50,7 @@ $NS_MEDIA = 'http://search.yahoo.com/mrss/';
 
 $channelTitle = (string) $atom->title;
 $base         = 'https://oloier.com/share/yt.php';
+$embedSize = [800, 450];
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>
@@ -65,7 +66,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $media   = $entry->children($NS_MEDIA)->group;
     $desc    = $media ? htmlspecialchars((string) $media->description) : '';
     $watch   = 'https://oloier.com/share/yt.php?v=' . $vid;
-    $embed   = '<iframe width="560" height="285" src="https://www.youtube.com/embed/' . $vid . '" frameborder="0" allowfullscreen="allowfullscreen"></iframe>';
+    $embed   = '<iframe width="' . $embedSize[0] . '" height="' . $embedSize[1] . '" src="https://www.youtube.com/embed/' . $vid . '" frameborder="0" allowfullscreen="allowfullscreen"></iframe>';
 ?>
 <item>
 <title><?= htmlspecialchars($title) ?></title>
